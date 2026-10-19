@@ -1,0 +1,2178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Bread</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a reading desk. Today's plan reading in a slim strip, scripture on a sheet at left, study tools in a tabbed panel at right; stacks on phones. Verse numbers are rubricated (red), as in manuscripts. */
+:root {
+  --bg: #E9EDF2;
+  --sheet: #FBFCFD;
+  --ink: #1A2232;
+  --muted: #5A6577;
+  --rule: #D3DAE3;
+  --lapis: #2B4E9B;
+  --lapis-wash: #E2E8F5;
+  --rubric: #A2342B;
+  --rubric-wash: #F5E5E2;
+  --ok: #2F6B45;
+  --ok-wash: #DCEFE2;
+  --warn: #8A5A00;
+  --warn-wash: #F8ECCF;
+  --c-promise: #F7E39B;
+  --c-command: #CBDDFA;
+  --c-question: #E4D5F5;
+  --c-key: #C9EAD3;
+  --f-scripture: "Literata", Georgia, "Times New Roman", serif;
+  --f-ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10141B; --sheet: #171D27; --ink: #E5E9F0; --muted: #98A3B4; --rule: #2A3341;
+    --lapis: #93B0F0; --lapis-wash: #1E2A44; --rubric: #E8887C; --rubric-wash: #3A2220;
+    --ok: #7FC79A; --ok-wash: #1C3526; --warn: #E6B657; --warn-wash: #3A2E14;
+    --c-promise: #554614; --c-command: #1E3963; --c-question: #3C2A5A; --c-key: #1D4630;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10141B; --sheet: #171D27; --ink: #E5E9F0; --muted: #98A3B4; --rule: #2A3341;
+  --lapis: #93B0F0; --lapis-wash: #1E2A44; --rubric: #E8887C; --rubric-wash: #3A2220;
+  --ok: #7FC79A; --ok-wash: #1C3526; --warn: #E6B657; --warn-wash: #3A2E14;
+  --c-promise: #554614; --c-command: #1E3963; --c-question: #3C2A5A; --c-key: #1D4630;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-ui); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 40px; display: grid; gap: 14px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--lapis); outline-offset: 2px; }
+.muted { color: var(--muted); }
+
+/* Top bar */
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.brand { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin-right: auto; }
+.brand h1 { font-family: var(--f-scripture); font-weight: 600; font-size: 1.45rem; margin: 0; letter-spacing: -0.01em; }
+.brand .verse { color: var(--muted); font-family: var(--f-scripture); font-style: italic; font-size: 0.9rem; }
+.goto { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.goto input, .goto select { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+#refInput { width: 15rem; max-width: 100%; }
+#transSel { max-width: 100%; }
+.btn { border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 8px 12px; font-weight: 500; }
+.btn:hover { border-color: var(--lapis); }
+.btn.primary { background: var(--lapis); border-color: var(--lapis); color: var(--sheet); }
+.btn.good { background: var(--ok); border-color: var(--ok); color: var(--sheet); }
+.btn.small { padding: 4px 9px; font-size: 0.85rem; }
+.btn:disabled { opacity: .5; cursor: default; }
+
+/* Today strip */
+.today { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 10px 14px; }
+.t-label { font-size: 0.72rem; letter-spacing: 0.09em; text-transform: uppercase; font-weight: 600; color: var(--rubric); }
+.today .grow { margin-right: auto; min-width: 0; }
+.today .plan-name { font-weight: 600; }
+.pill { display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; border-radius: 999px; padding: 2px 9px; background: var(--lapis-wash); color: var(--lapis); font-weight: 500; white-space: nowrap; }
+.pill.good { background: var(--ok-wash); color: var(--ok); }
+.pill.warn { background: var(--rubric-wash); color: var(--rubric); }
+.chapchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chapchip { border: 1px solid var(--rule); background: var(--bg); border-radius: 999px; padding: 3px 11px; font-size: 0.86rem; font-weight: 500; }
+.chapchip:hover { border-color: var(--lapis); color: var(--lapis); }
+.chapchip.here { border-color: var(--lapis); background: var(--lapis-wash); color: var(--lapis); }
+
+.desk { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .desk { grid-template-columns: minmax(0, 1fr); } }
+
+/* Scripture sheet */
+.sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 28px clamp(18px, 4vw, 44px) 32px; min-width: 0; }
+.sheet-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 18px; }
+.sheet-head h2 { font-family: var(--f-scripture); font-weight: 600; font-size: 2rem; margin: 0; text-wrap: balance; line-height: 1.15; }
+.trans-tag { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.nav { margin-left: auto; display: flex; gap: 6px; }
+.scripture { font-family: var(--f-scripture); font-size: 1.14rem; line-height: 1.9; max-width: 64ch; }
+.v { cursor: pointer; border-radius: 3px; padding: 2px 1px; transition: background-color .15s, box-shadow .15s; }
+.v:hover { background: var(--lapis-wash); }
+.v[data-hl="promise"] { background: var(--c-promise); }
+.v[data-hl="command"] { background: var(--c-command); }
+.v[data-hl="question"] { background: var(--c-question); }
+.v[data-hl="key"] { background: var(--c-key); }
+.v.sel { box-shadow: 0 0 0 1.5px var(--lapis); }
+.v.sel:not([data-hl]) { background: var(--lapis-wash); }
+.v sup { font-family: var(--f-ui); font-weight: 600; font-size: 0.66em; color: var(--rubric); margin-right: 3px; vertical-align: 0.45em; }
+.hint { color: var(--muted); font-size: 0.85rem; margin-top: 18px; }
+.loading { color: var(--muted); font-style: italic; }
+.skel { height: 1rem; border-radius: 4px; background: var(--rule); margin: 0.9rem 0; opacity: .6; }
+
+.selbar { position: sticky; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); margin-top: 18px; display: grid; gap: 8px; background: var(--ink); color: var(--sheet); border-radius: 14px; padding: 10px 12px; font-size: 0.88rem; }
+.selbar .row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.selbar .lbl { margin-right: auto; font-weight: 600; }
+.selbar .btn { background: transparent; border-color: color-mix(in srgb, var(--sheet) 35%, transparent); color: var(--sheet); border-radius: 999px; }
+.selbar .btn:hover { border-color: var(--sheet); }
+.swatch { display: inline-flex; align-items: center; gap: 6px; border: 1px solid color-mix(in srgb, var(--sheet) 35%, transparent); background: transparent; color: var(--sheet); border-radius: 999px; padding: 3px 10px 3px 5px; font-size: 0.82rem; }
+.swatch:hover { border-color: var(--sheet); }
+.dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); flex: none; }
+.dot.promise { background: var(--c-promise); } .dot.command { background: var(--c-command); } .dot.question { background: var(--c-question); } .dot.key { background: var(--c-key); }
+
+/* Study panel */
+.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); min-width: 0; display: flex; flex-direction: column; }
+@media (min-width: 861px) { .panel { position: sticky; top: calc(12px + env(safe-area-inset-top, 0px)); max-height: calc(100vh - 24px); } }
+.panel-head { display: flex; padding: 10px 12px 0; }
+.groups { display: flex; gap: 4px; background: var(--bg); border-radius: 9px; padding: 3px; width: 100%; }
+.groups button { flex: 1; border: 0; background: none; border-radius: 7px; padding: 6px 10px; font-weight: 600; font-size: 0.88rem; color: var(--muted); }
+.groups button[aria-pressed="true"] { background: var(--sheet); color: var(--ink); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 15%, transparent); }
+.tabs { display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid var(--rule); padding: 4px 8px 0; scrollbar-width: thin; }
+.tab { border: 0; background: none; padding: 9px 11px 10px; font-weight: 500; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--rubric); }
+.tab:hover { color: var(--ink); }
+.pane-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 18px 0; color: var(--muted); font-size: 0.85rem; }
+.pane-tools .grow, .row .grow { margin-right: auto; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
+.seg button { border: 0; background: none; padding: 4px 10px; font-size: 0.83rem; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; }
+.seg button[aria-pressed="true"] { background: var(--lapis-wash); color: var(--lapis); font-weight: 600; }
+.pane { padding: 14px 18px 22px; overflow-y: auto; min-height: 260px; }
+.example { display: inline-block; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--rubric); background: var(--rubric-wash); border-radius: 4px; padding: 2px 6px; }
+.prose { max-width: 62ch; }
+.prose h3 { font-family: var(--f-scripture); font-size: 1.05rem; font-weight: 600; margin: 1.1em 0 0.3em; text-wrap: balance; }
+.prose h3:first-child { margin-top: 0.2em; }
+.prose p { margin: 0 0 0.75em; }
+.prose ul { margin: 0 0 0.8em; padding-left: 1.2em; }
+.prose li { margin-bottom: 0.3em; }
+.thinking { color: var(--muted); font-style: italic; display: flex; align-items: center; gap: 10px; }
+.err { color: var(--rubric); }
+.sec-h { font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+.sec + .sec { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--rule); }
+
+.words { display: grid; gap: 12px; }
+.word { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.word:last-child { border-bottom: 0; }
+.word .en { font-weight: 600; }
+.word .orig { font-family: var(--f-scripture); font-size: 1.15rem; }
+.word .tl { color: var(--muted); font-style: italic; }
+.word .num { font-family: var(--f-mono); font-size: 0.78rem; color: var(--lapis); align-self: start; }
+.word .mean { grid-column: 1 / -1; }
+
+.xrefs { display: grid; gap: 10px; }
+.xref { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; align-items: baseline; }
+.xref .from { font-family: var(--f-mono); font-size: 0.75rem; color: var(--rubric); grid-row: span 2; min-width: 3.6em; }
+.link { background: none; border: 0; padding: 0; color: var(--lapis); font-weight: 600; text-align: left; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.xref .why { color: var(--muted); }
+
+.qgroup + .qgroup { margin-top: 16px; }
+.qgroup ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
+.qgroup li button { margin-left: 6px; }
+
+.chat { display: grid; gap: 12px; }
+.msg-u { justify-self: end; background: var(--lapis-wash); border-radius: 12px 12px 2px 12px; padding: 8px 12px; max-width: 85%; overflow-wrap: anywhere; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--rule); background: none; border-radius: 999px; padding: 5px 11px; font-size: 0.85rem; }
+.chip:hover { border-color: var(--lapis); color: var(--lapis); }
+.composer { display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid var(--rule); }
+.composer textarea { flex: 1; min-width: 0; resize: vertical; min-height: 2.6em; background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; }
+
+.form { display: grid; gap: 8px; }
+.form textarea, .form input[type="text"] { min-width: 0; width: 100%; background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 9px 10px; }
+.form textarea { min-height: 5em; resize: vertical; }
+.form .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.form .row .grow { color: var(--muted); font-size: 0.85rem; }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.88rem; color: var(--muted); }
+.list { display: grid; gap: 10px; }
+.entry { border-top: 1px solid var(--rule); padding-top: 10px; display: grid; gap: 4px; }
+.entry .meta { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; font-size: 0.82rem; color: var(--muted); }
+.entry .meta .grow { margin-right: auto; }
+.entry .body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.entry .answer { border-left: 2px solid var(--ok); padding-left: 10px; color: var(--ok); font-size: 0.92rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.entry .vtext { font-family: var(--f-scripture); border-radius: 4px; padding: 4px 8px; }
+.store-note { font-size: 0.8rem; color: var(--muted); }
+.empty { color: var(--muted); }
+
+/* Plans */
+.plans { display: grid; gap: 10px; }
+.plan-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; border: 1px solid var(--rule); border-radius: 9px; padding: 12px 14px; }
+.plan-card h4 { margin: 0; font-size: 1rem; }
+.plan-card p { margin: 0; color: var(--muted); font-size: 0.88rem; grid-column: 1; }
+.plan-card .btn { grid-row: 1 / span 2; grid-column: 2; }
+.progress { height: 8px; border-radius: 999px; background: var(--bg); overflow: hidden; margin: 10px 0 6px; }
+.progress > i { display: block; height: 100%; background: var(--ok); border-radius: 999px; }
+.stats { display: flex; flex-wrap: wrap; gap: 6px; }
+.days { display: grid; grid-template-columns: repeat(auto-fill, minmax(26px, 1fr)); gap: 4px; margin-top: 14px; }
+.day { aspect-ratio: 1; max-width: 100%; border: 1px solid var(--rule); background: var(--bg); border-radius: 5px; font-size: 0.66rem; font-family: var(--f-mono); color: var(--muted); padding: 0; font-variant-numeric: tabular-nums; }
+.day.done { background: var(--ok); border-color: var(--ok); color: var(--sheet); }
+.day.next { border-color: var(--lapis); color: var(--lapis); font-weight: 600; }
+.day.picked { box-shadow: 0 0 0 2px var(--rubric); }
+.daydetail { margin-top: 14px; border: 1px solid var(--rule); border-radius: 9px; padding: 12px 14px; display: grid; gap: 8px; }
+
+/* Topics */
+.topic-form { display: flex; gap: 8px; }
+.topic-form input { flex: 1; min-width: 0; background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 9px 10px; }
+.tgroup { margin-top: 16px; }
+.tgroup h4 { font-family: var(--f-scripture); font-size: 1.02rem; margin: 0 0 6px; }
+.tgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.tgroup li { display: grid; grid-template-columns: minmax(7.5em, auto) minmax(0, 1fr); gap: 10px; align-items: baseline; }
+@media (max-width: 480px) { .tgroup li { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+/* Read aloud */
+.listenbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: -6px 0 16px; padding: 8px 10px; border-radius: 9px; background: var(--lapis-wash); color: var(--lapis); font-size: 0.86rem; }
+.listenbar .grow { margin-right: auto; font-weight: 600; }
+[hidden] { display: none !important; }
+.v.reading { box-shadow: inset 0 -2px 0 var(--rubric); background: var(--rubric-wash); }
+
+/* Compare */
+.cmp { display: grid; gap: 16px; }
+.cmp-verse h4 { margin: 0 0 6px; font-size: 0.8rem; color: var(--rubric); font-family: var(--f-ui); letter-spacing: 0.04em; }
+.cmp-row { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 10px; align-items: baseline; padding: 4px 0; }
+.cmp-row .tag { font-family: var(--f-mono); font-size: 0.75rem; color: var(--lapis); font-weight: 500; }
+.cmp-row .txt { font-family: var(--f-scripture); }
+.cmp-row.mine .txt { font-weight: 600; }
+.diff { border-left: 2px solid var(--lapis); padding-left: 12px; margin-bottom: 16px; }
+
+/* People and places */
+.pp { display: grid; gap: 14px; }
+.pp-item { display: grid; gap: 3px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.pp-item:last-child { border-bottom: 0; }
+.pp-item .nm { font-family: var(--f-scripture); font-weight: 600; font-size: 1.08rem; }
+.pp-item .who { color: var(--muted); }
+.pp-item .refs { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.9rem; }
+.lookup { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--rule); }
+
+/* ---- Sermon workshop (scoped) ---- */
+/* Header */
+
+
+
+
+.sw .picker { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sw .picker select { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; max-width: 100%; min-width: 0; }
+
+/* Steps */
+.sw .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+@media (max-width: 640px) { .sw .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sw .step { text-align: left; border: 1px solid var(--rule); background: var(--sheet); border-radius: 9px; padding: 9px 12px; display: grid; gap: 1px; min-width: 0; }
+.sw .step .n { font-family: var(--f-mono); font-size: 0.72rem; color: var(--rubric); letter-spacing: 0.06em; }
+.sw .step .t { font-weight: 600; }
+.sw .step .s { font-size: 0.78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sw .step[aria-current="step"] { border-color: var(--lapis); box-shadow: inset 0 -3px 0 var(--lapis); }
+.sw .step.done .s { color: var(--ok); }
+
+.sw .bench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .sw .bench { grid-template-columns: minmax(0, 1fr); } }
+.sw .surface { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 22px clamp(16px, 3vw, 32px) 28px; min-width: 0; display: grid; gap: 22px; }
+.sw .surface h2 { font-family: var(--f-scripture); font-size: 1.5rem; margin: 0; text-wrap: balance; }
+.sw .lede { margin: 4px 0 0; color: var(--muted); max-width: 62ch; }
+.sw .field { display: grid; gap: 6px; }
+.sw .field label, .sw .lbl { font-weight: 600; font-size: 0.9rem; }
+.sw .field .help { font-size: 0.83rem; color: var(--muted); margin-top: -3px; }
+.sw .field input[type="text"], .sw .field input[type="date"], .sw .field input[type="number"], .sw .field textarea, .sw .field select {
+  width: 100%; min-width: 0; background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 9px 11px;
+}
+.sw .field textarea { resize: vertical; min-height: 6em; line-height: 1.55; }
+.sw .field textarea.tall { min-height: 14em; font-family: var(--f-scripture); font-size: 1.02rem; }
+.sw .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sw .row .grow { margin-right: auto; }
+.sw .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.sw .passage { font-family: var(--f-scripture); font-size: 1.05rem; line-height: 1.8; max-height: 22em; overflow-y: auto; padding: 14px 16px; background: var(--bg); border-radius: 9px; }
+.sw .passage sup { font-family: var(--f-ui); font-weight: 600; font-size: 0.66em; color: var(--rubric); margin-right: 3px; }
+.sw .research { border: 1px solid var(--rule); border-radius: 9px; padding: 12px 14px; }
+.sw .research + .research { margin-top: 8px; }
+.sw .research summary { cursor: pointer; font-weight: 600; }
+
+/* Section cards */
+.sw .sec { border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; display: grid; gap: 10px; }
+.sw .sec-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+.sw .sec-head .kind { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rubric); }
+.sw .sec-head .job { color: var(--muted); font-size: 0.85rem; margin-right: auto; }
+.sw .pill { display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; border-radius: 999px; padding: 2px 9px; background: var(--lapis-wash); color: var(--lapis); font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sw .pill.ok { background: var(--ok-wash); color: var(--ok); }
+.sw .pill.warn { background: var(--warn-wash); color: var(--warn); }
+.sw .pill.long { background: var(--rubric-wash); color: var(--rubric); }
+
+/* Rail */
+.sw .rail { display: grid; gap: 14px; min-width: 0; }
+@media (min-width: 901px) { .sw .rail { position: sticky; top: calc(12px + env(safe-area-inset-top, 0px)); max-height: calc(100vh - 24px); overflow-y: auto; } }
+.sw .card { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 14px 16px; min-width: 0; }
+.sw .card h3 { margin: 0 0 8px; font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.sw .clock-big { display: flex; align-items: baseline; gap: 8px; }
+.sw .clock-big b { font-family: var(--f-scripture); font-size: 2.1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sw .meter { position: relative; height: 10px; border-radius: 999px; background: var(--bg); margin: 10px 0 4px; overflow: hidden; }
+.sw .meter i { position: absolute; inset: 0 auto 0 0; background: var(--lapis); border-radius: 999px; }
+.sw .meter i.ok { background: var(--ok); } .sw .meter i.long { background: var(--rubric); }
+.sw .meter .tgt { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink); }
+.sw .split { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 2px 10px; font-size: 0.84rem; margin-top: 10px; font-variant-numeric: tabular-nums; }
+.sw .split span:nth-child(3n+2), .sw .split span:nth-child(3n) { text-align: right; }
+.sw .split .h { color: var(--muted); font-size: 0.74rem; }
+.sw .settings { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; font-size: 0.84rem; color: var(--muted); align-items: center; }
+.sw .settings select, .sw .settings input { background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 3px 6px; width: auto; }
+.sw .settings input { width: 4.2em; }
+.sw .coach-label { font-weight: 600; margin-bottom: 4px; }
+.sw .rule-note { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 8px; margin-top: 10px; }
+.sw .prose { max-width: 62ch; }
+.sw .prose h3 { font-family: var(--f-scripture); font-size: 1rem; font-weight: 600; margin: 1em 0 0.3em; text-transform: none; letter-spacing: 0; color: var(--ink); }
+.sw .prose h3:first-child { margin-top: 0.1em; }
+.sw .prose p { margin: 0 0 0.7em; }
+.sw .prose ul { margin: 0 0 0.7em; padding-left: 1.2em; }
+.sw .prose li { margin-bottom: 0.3em; }
+.sw .thinking { color: var(--muted); font-style: italic; display: flex; align-items: center; gap: 10px; }
+.sw .err { color: var(--rubric); }
+.sw .empty { color: var(--muted); }
+
+/* Rehearse */
+.sw .timer { display: grid; gap: 10px; border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.sw .timer .digits { font-family: var(--f-mono); font-size: 2.6rem; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.sw .timer .now { font-weight: 600; }
+.sw table.times { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+.sw table.times th, .sw table.times td { padding: 6px 8px; border-bottom: 1px solid var(--rule); text-align: right; white-space: nowrap; }
+.sw table.times th:first-child, .sw table.times td:first-child { text-align: left; white-space: normal; }
+.sw table.times th { font-size: 0.76rem; color: var(--muted); font-weight: 600; }
+.sw table.times tr.cur td { background: var(--lapis-wash); }
+.sw .tablewrap { overflow-x: auto; }
+.sw .manuscript { font-family: var(--f-scripture); line-height: 1.75; max-width: 66ch; }
+.sw .manuscript h3 { font-size: 1.1rem; margin: 1.2em 0 0.3em; }
+.sw .manuscript p { margin: 0 0 0.8em; white-space: pre-wrap; }
+.sw .manuscript .big { font-style: italic; border-left: 3px solid var(--rubric); padding-left: 12px; }
+
+/* Empty state */
+.sw .welcome { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 28px clamp(16px, 4vw, 40px); display: grid; gap: 18px; }
+.sw .welcome h2 { font-family: var(--f-scripture); font-size: 1.7rem; margin: 0; text-wrap: balance; }
+.sw .welcome ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; max-width: 64ch; }
+
+/* Sermon workshop section */
+.desk.sermon-mode { grid-template-columns: minmax(0, 1fr); }
+.desk.sermon-mode .sheet { display: none; }
+.desk.sermon-mode .panel { position: static; max-height: none; }
+#sermonRoot { padding: 14px 16px 20px; display: grid; gap: 14px; }
+.sw-head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+.sw-title { font-family: var(--f-scripture); font-weight: 600; font-size: 1.3rem; }
+.sw-verse { color: var(--muted); font-family: var(--f-scripture); font-style: italic; font-size: 0.86rem; }
+
+footer { color: var(--muted); font-size: 0.8rem; max-width: 80ch; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="bar">
+    <div class="brand">
+      <h1>Daily Bread</h1>
+      <span class="verse">“Give us this day our daily bread” · Mt 6:11</span>
+      <button class="link verse" id="swLink" style="font-style:normal;font-family:var(--f-ui);font-size:.88rem">Sermon workshop</button>
+    </div>
+    <form class="goto" id="gotoForm" autocomplete="off">
+      <input id="refInput" list="bookList" placeholder="Go to, e.g. John 3 or Romans 8:28-39" aria-label="Passage reference">
+      <datalist id="bookList"></datalist>
+      <select id="transSel" aria-label="Translation"></select>
+      <button class="btn primary" type="submit">Open</button>
+    </form>
+  </header>
+
+  <section class="today" id="today" aria-label="Today's reading"></section>
+
+  <main class="desk">
+    <article class="sheet" aria-live="polite">
+      <div class="sheet-head">
+        <h2 id="refTitle">Psalm 23</h2>
+        <span class="trans-tag" id="transTag">KJV</span>
+        <div class="nav">
+          <button class="btn small" id="listenBtn" title="Read this chapter aloud" hidden>Listen</button>
+          <button class="btn small" id="prevBtn" title="Previous chapter">‹ Prev</button>
+          <button class="btn small" id="nextBtn" title="Next chapter">Next ›</button>
+        </div>
+      </div>
+      <div class="listenbar" id="listenbar" hidden></div>
+      <div class="scripture" id="scripture"></div>
+      <div class="selbar" id="selbar" hidden>
+        <div class="row">
+          <span class="lbl" id="selLabel"></span>
+          <button class="btn small" id="selExplain">Explain</button>
+          <button class="btn small" id="selAsk">Ask</button>
+          <button class="btn small" id="selNote">Note</button>
+          <button class="btn small" id="selPray">Pray</button>
+          <button class="btn small" id="selClear">Clear</button>
+        </div>
+        <div class="row" id="swatches"></div>
+      </div>
+      <p class="hint" id="hint">Tap verses to select them. Then you can highlight them, explain them, ask about them, pray through them, or write a note.</p>
+    </article>
+
+    <section class="panel" aria-label="Study tools">
+      <div class="panel-head"><div class="groups" id="groups" role="group" aria-label="Tool group"></div></div>
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div class="pane-tools" id="paneTools"></div>
+      <div class="pane" id="pane" role="tabpanel"></div>
+      <form class="composer" id="askForm" hidden>
+        <textarea id="askInput" rows="1" placeholder="Ask anything about this passage"></textarea>
+        <button class="btn primary" type="submit" id="askSend">Ask</button>
+      </form>
+      <section id="sermonRoot" class="sw" hidden>
+        <div class="sw-head">
+          <div><div class="sw-title">Sermon workshop</div><div class="sw-verse">“A workman that needeth not to be ashamed” · 2 Tim 2:15</div></div>
+          <div class="picker" id="picker">
+      <select id="sermonSel" aria-label="Your sermons"></select>
+      <button class="btn primary" id="newBtn">New sermon</button>
+      <span id="delWrap"><button class="btn" id="delBtn">Delete</button></span>
+    </div>
+        </div>
+  <div id="welcome" class="welcome" hidden>
+    <h2>Prepare a sermon you wrote yourself, with a coach beside you</h2>
+    <p class="lede" style="margin:0">You do the study and the writing. The coach asks questions, checks your work against the passage, and keeps an eye on the clock. It won't write the sermon for you.</p>
+    <ol>
+      <li><strong>Text &amp; study.</strong> Choose your passage, read it closely, and write down what you see. Pull up background, key words and cross-references when you need them.</li>
+      <li><strong>Big idea.</strong> Say in one sentence what the passage means and what it means for your people.</li>
+      <li><strong>Outline &amp; write.</strong> Build your introduction, points and conclusion. Ask the coach to review each part, or for a nudge when you're stuck.</li>
+      <li><strong>Review.</strong> Read the whole sermon through, get a full review from the coach, and save it.</li>
+    </ol>
+    <div class="row"><button class="btn primary" id="welcomeNew">Start your first sermon</button><span class="muted" id="welcomeWhere"></span></div>
+  </div>
+
+  <nav class="steps" id="steps" aria-label="Preparation steps" hidden></nav>
+
+  <main class="bench" id="bench" hidden>
+    <section class="surface" id="surface" aria-live="polite"></section>
+    <aside class="rail">
+      <div class="card" id="coachCard"></div>
+    </aside>
+  </main>
+
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    Passage text and study help are written by Claude on request from public-domain translations. Check the wording against your own Bible, and treat explanations as a study partner's thoughts, not the final word.
+  </footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+const BOOKS = [["Genesis",50],["Exodus",40],["Leviticus",27],["Numbers",36],["Deuteronomy",34],["Joshua",24],["Judges",21],["Ruth",4],["1 Samuel",31],["2 Samuel",24],["1 Kings",22],["2 Kings",25],["1 Chronicles",29],["2 Chronicles",36],["Ezra",10],["Nehemiah",13],["Esther",10],["Job",42],["Psalms",150],["Proverbs",31],["Ecclesiastes",12],["Song of Solomon",8],["Isaiah",66],["Jeremiah",52],["Lamentations",5],["Ezekiel",48],["Daniel",12],["Hosea",14],["Joel",3],["Amos",9],["Obadiah",1],["Jonah",4],["Micah",7],["Nahum",3],["Habakkuk",3],["Zephaniah",3],["Haggai",2],["Zechariah",14],["Malachi",4],["Matthew",28],["Mark",16],["Luke",24],["John",21],["Acts",28],["Romans",16],["1 Corinthians",16],["2 Corinthians",13],["Galatians",6],["Ephesians",6],["Philippians",4],["Colossians",4],["1 Thessalonians",5],["2 Thessalonians",3],["1 Timothy",6],["2 Timothy",4],["Titus",3],["Philemon",1],["Hebrews",13],["James",5],["1 Peter",5],["2 Peter",3],["1 John",5],["2 John",1],["3 John",1],["Jude",1],["Revelation",22]];
+const ALIAS = { "psalm": "Psalms", "ps": "Psalms", "song of songs": "Song of Solomon", "songs": "Song of Solomon", "canticles": "Song of Solomon", "revelations": "Revelation", "phil": "Philippians", "philem": "Philemon", "jud": "Judges", "jn": "John", "mt": "Matthew", "mk": "Mark", "lk": "Luke" };
+const TRANS = { KJV: "King James Version", WEB: "World English Bible", ASV: "American Standard Version (1901)", YLT: "Young's Literal Translation" };
+const TABS = [
+  ["explain","Explain","passage"],["context","Background","passage"],["words","Key words","passage"],["xref","Cross-references","passage"],["questions","Questions","passage"],["compare","Compare","passage"],["people","People & places","passage"],["ask","Ask","passage"],
+  ["reflect","Today's reflection","mine"],["plan","Reading plan","mine"],["highlights","Highlights","mine"],["notes","Notes","mine"],["prayer","Prayer journal","mine"],["topics","Topics","mine"],
+  ["sermon","Sermon workshop","sermon"]
+];
+const GROUPS = [["passage","This passage"],["mine","My study"],["sermon","Sermon workshop"]];
+const COLORS = [["promise","Promise"],["command","Command"],["question","Question"],["key","Key verse"]];
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem("lamp:" + k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem("lamp:" + k, JSON.stringify(v)); } catch {} }
+};
+const uid = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const ymd = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const todayYmd = () => ymd(new Date());
+const daysBetween = (a, b) => Math.round((new Date(b + "T00:00") - new Date(a + "T00:00")) / 864e5);
+const fmtDate = (v) => new Date(typeof v === "string" ? v + "T00:00" : v).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+
+/* ---------- references ---------- */
+function findBook(raw) {
+  const s = raw.toLowerCase().replace(/\./g, "").replace(/\s+/g, " ").trim().replace(/^(\d)\s?/, "$1 ");
+  if (ALIAS[s]) return ALIAS[s];
+  const exact = BOOKS.find(([b]) => b.toLowerCase() === s);
+  if (exact) return exact[0];
+  const pre = BOOKS.find(([b]) => b.toLowerCase().startsWith(s));
+  if (pre) return pre[0];
+  const loose = BOOKS.find(([b]) => b.toLowerCase().replace(/ /g, "").startsWith(s.replace(/ /g, "")));
+  return loose ? loose[0] : null;
+}
+function parseRef(text) {
+  const t = String(text || "").trim().replace(/[-–]\s*\d+:\d+.*$/, "").replace(/[;,].*$/, "");
+  const m = t.match(/^((?:[1-3]\s*)?[A-Za-z][A-Za-z .]*?)\s*(\d+)?(?:\s*:\s*(\d+)(?:\s*[-–]\s*(\d+))?)?$/);
+  if (!m) return null;
+  const book = findBook(m[1]);
+  if (!book) return null;
+  const max = BOOKS.find(b => b[0] === book)[1];
+  const ch = Math.min(Math.max(parseInt(m[2] || "1", 10), 1), max);
+  const from = m[3] ? parseInt(m[3], 10) : null;
+  const to = m[4] ? parseInt(m[4], 10) : from;
+  return { book, ch, from, to: to && from && to < from ? from : to };
+}
+function bookLabel(b) { return b === "Psalms" ? "Psalm" : b; }
+function refLabel(r) {
+  let s = bookLabel(r.book) + " " + r.ch;
+  if (r.from) s += ":" + r.from + (r.to && r.to !== r.from ? "–" + r.to : "");
+  return s;
+}
+function versesLabel(nums) {
+  const a = [...nums].sort((x, y) => x - y);
+  const parts = [];
+  for (let i = 0; i < a.length; i++) {
+    let j = i;
+    while (j + 1 < a.length && a[j + 1] === a[j] + 1) j++;
+    parts.push(i === j ? String(a[i]) : a[i] + "–" + a[j]);
+    i = j;
+  }
+  return parts.join(", ");
+}
+const bookIndex = (b) => BOOKS.findIndex(x => x[0] === b);
+
+/* ---------- state ---------- */
+const S = {
+  trans: "KJV",
+  ref: { book: "Psalms", ch: 23, from: null, to: null },
+  verses: [],
+  sel: new Set(),
+  tab: "explain",
+  depth: "plain",
+  focus: null,
+  loadingPassage: false,
+  chats: new Map(),
+  pickedDay: null,
+  hlFilter: "all",
+  prFilter: "open",
+  notesFilter: "here",
+  topic: null,
+};
+const results = new Map();
+const pkey = () => S.trans + "|" + refLabel(S.ref);
+const passageText = () => S.verses.map(v => v.n + " " + v.text).join("\n");
+const groupOf = (tab) => (TABS.find(t => t[0] === tab) || TABS[0])[2];
+
+/* ---------- example passage (Psalm 23, KJV, public domain) ---------- */
+const PS23 = [
+  { n: 1, text: "The LORD is my shepherd; I shall not want." },
+  { n: 2, text: "He maketh me to lie down in green pastures: he leadeth me beside the still waters." },
+  { n: 3, text: "He restoreth my soul: he leadeth me in the paths of righteousness for his name's sake." },
+  { n: 4, text: "Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me; thy rod and thy staff they comfort me." },
+  { n: 5, text: "Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over." },
+  { n: 6, text: "Surely goodness and mercy shall follow me all the days of my life: and I will dwell in the house of the LORD for ever." }
+];
+const EX = "KJV|Psalm 23";
+results.set(EX + "|explain|plain|", { status: "done", example: true, text:
+`### v. 1 · The Lord is my shepherd
+David, who was a shepherd before he was a king, pictures God as the one who looks after him. "I shall not want" means "I won't lack anything I truly need."
+
+### v. 2–3 · Rest and guidance
+A good shepherd finds safe grass and calm water, because sheep won't rest or drink when they are afraid. God gives rest, restores David's life and strength, and leads him on the right paths. He does this "for his name's sake": God's own good character is on the line.
+
+### v. 4 · The dark valley
+The road sometimes runs through deep, dangerous shadow. David doesn't say he avoids it; he says he walks *through* it without fear, because God is with him. Notice the shift from talking *about* God ("he") to talking *to* God ("thou"). The rod protected the sheep and the staff guided them.
+
+### v. 5–6 · The generous host
+The picture changes to a host welcoming a guest. A meal in front of enemies shows open protection and honor; oil on the head and an overflowing cup show lavish welcome. God's goodness and steadfast love don't just follow David, they chase after him for life.
+
+### The big idea
+God is both the shepherd who guides and protects in every season and the host who welcomes us to stay with him for good.` });
+results.set(EX + "|context", { status: "done", example: true, text:
+`### Who wrote it
+The heading reads "A Psalm of David." David spent his youth keeping his father's sheep near Bethlehem (1 Samuel 16:11; 17:34–35), so the image comes from his own life.
+
+### What kind of writing
+A psalm of trust: a song that says why the singer feels safe with God, rather than asking for help or giving thanks for one rescue.
+
+### How it is built
+Two pictures. Verses 1–4 show God as shepherd; verses 5–6 show God as host. The center, "for thou art with me" (v. 4), is where David stops speaking about God and speaks to him.
+
+### Where it sits in the big story
+Shepherd language for God runs through the Old Testament (Genesis 48:15; Isaiah 40:11; Ezekiel 34). Jesus takes it up in John 10, "I am the good shepherd," and the image returns at the end of the Bible in Revelation 7:17.` });
+results.set(EX + "|words", { status: "done", example: true, data: { words: [
+  { english: "LORD", original: "יְהוָה", translit: "YHWH", strongs: "H3068", meaning: "God's personal, covenant name, revealed to Moses (Exodus 3:14–15). Printed in small capitals in many English Bibles." },
+  { english: "shepherd", original: "רֹעִי", translit: "ro'i (from ra'ah)", strongs: "H7462", meaning: "To tend, feed and pasture. Also used of kings as shepherds of their people." },
+  { english: "want", original: "אֶחְסָר", translit: "ekhsar (from chaser)", strongs: "H2637", meaning: "To lack or be short of something. Used of Israel in the wilderness: \"thou hast lacked nothing\" (Deuteronomy 2:7)." },
+  { english: "restoreth", original: "יְשׁוֹבֵב", translit: "yeshovev (from shuv)", strongs: "H7725", meaning: "To bring back or turn around. It can mean reviving strength or bringing a wanderer home." },
+  { english: "shadow of death", original: "צַלְמָוֶת", translit: "tsalmaveth", strongs: "H6757", meaning: "Deep darkness or deathly gloom. Covers any terrifying darkness, not only dying." },
+  { english: "mercy", original: "חֶסֶד", translit: "chesed", strongs: "H2617", meaning: "Loyal, steadfast love that keeps covenant. Often translated \"lovingkindness.\"" },
+  { english: "follow", original: "יִרְדְּפוּנִי", translit: "yirdefuni (from radaph)", strongs: "H7291", meaning: "To pursue or chase. Usually used of enemies hunting someone down; here goodness and love do the chasing." }
+] } });
+results.set(EX + "|xref", { status: "done", example: true, data: { refs: [
+  { from: "v. 1", ref: "John 10:11", why: "Jesus calls himself the good shepherd who lays down his life for the sheep." },
+  { from: "v. 1", ref: "Isaiah 40:11", why: "God feeds his flock and carries the lambs close to his heart." },
+  { from: "v. 1–3", ref: "Ezekiel 34:11-16", why: "God promises to search for his scattered sheep and give them rich pasture himself." },
+  { from: "v. 1", ref: "Philippians 4:19", why: "\"My God shall supply all your need\" echoes \"I shall not want.\"" },
+  { from: "v. 2", ref: "Revelation 7:17", why: "The Lamb will shepherd his people and lead them to springs of living water." },
+  { from: "v. 4", ref: "Isaiah 43:2", why: "\"When thou passest through the waters, I will be with thee.\"" },
+  { from: "v. 5", ref: "Luke 7:46", why: "Anointing a guest's head with oil as a sign of honor and welcome." },
+  { from: "v. 6", ref: "Psalm 27:4", why: "David's one desire is to dwell in the house of the LORD all his life." }
+] } });
+results.set(EX + "|people", { status: "done", example: true, data: {
+  people: [
+    { name: "David", who: "Shepherd boy who became Israel's second and greatest king, around 1000 BC.", story: "The youngest son of Jesse of Bethlehem, he kept his father's sheep and fought off lions and bears to protect them. Samuel anointed him king while Saul still reigned. He wrote many psalms, and God promised that his family line would rule forever, a promise the New Testament sees fulfilled in Jesus, the \"Son of David.\"", refs: ["1 Samuel 16:1-13", "1 Samuel 17:34-37", "2 Samuel 7:8-16", "Matthew 1:1"] },
+    { name: "The LORD (YHWH)", who: "The God of Israel, called by his covenant name.", story: "God revealed this name to Moses at the burning bush and bound himself to Israel by covenant. Calling him \"my shepherd\" makes that covenant personal: the God of the whole nation cares for one person.", refs: ["Exodus 3:13-15", "Genesis 48:15", "John 10:11"] }
+  ],
+  places: [
+    { name: "The house of the LORD", what: "The place where God's presence dwelt among his people.", today: "In David's day this was the tabernacle tent in Jerusalem. His son Solomon later built the temple on Mount Moriah, today's Temple Mount.", refs: ["2 Samuel 6:17", "1 Kings 6:1", "Psalm 27:4"] },
+    { name: "Bethlehem", what: "David's hometown in the hill country of Judah, where he kept his father's sheep.", today: "A town about 6 miles (10 km) south of Jerusalem, in the West Bank.", refs: ["1 Samuel 16:1", "Micah 5:2", "Luke 2:4-11"] }
+  ]
+} });
+results.set(EX + "|questions", { status: "done", example: true, data: {
+  observation: ["What does the shepherd do for the sheep in verses 1–3? List each action.", "Where does David switch from \"he\" to \"thou\"? What is happening in the psalm at that moment?", "What two pictures of God does the psalm use, and where does it change from one to the other?"],
+  interpretation: ["Why might sheep need to be \"made\" to lie down (v. 2)?", "What does it mean that goodness and mercy \"follow\" or pursue someone?", "How does Jesus' claim in John 10:11 change how a Christian reads verse 1?"],
+  application: ["What \"valley\" are you walking through right now, and what would it look like to trust that God is with you in it?", "Where do you feel you are lacking something? How does verse 1 speak to that?", "Who could you show the kind of welcome described in verse 5 this week?"]
+} });
+
+/* ---------- capabilities ---------- */
+let sample = null;
+let sampleState = "pending";
+const use = (name) => (window.claude && window.claude.use) ? window.claude.use(name).catch(() => null) : Promise.resolve(null);
+use("sample").then(s => { sample = s; sampleState = s ? "ready" : "off"; renderPane(); });
+
+const ERR = {
+  not_granted: "Asking Claude isn't allowed for this page. You can allow it from the page's permissions menu.",
+  rate_limited: "Too many requests at once. Wait a moment, then try again.",
+  prompt_too_large: "This passage is too long to send at once. Try a shorter range of verses.",
+  session_expired: "Your session has expired. Reload the page and sign in again.",
+  sampling_disabled: "Asking Claude is turned off for your account.",
+  refused: "Claude declined to answer this one. Try rewording it.",
+  invalid_json: "The answer came back in a broken format. Try again.",
+  empty_completion: "Claude returned an empty answer. Try again.",
+};
+const errCopy = (e) => ERR[e && e.code] || "Something went wrong reaching Claude. Try again.";
+const NO_CLAUDE = `<p class="empty">This needs permission to ask Claude, which isn't available in this view.</p>`;
+
+/* ---------- personal stores: account (db) with browser fallback ---------- */
+class Coll {
+  constructor(name, localKey, filter) { this.name = name; this.localKey = localKey; this.filter = filter || (() => true); this.items = []; this.mode = "pending"; this.subs = []; this.q = Promise.resolve(); }
+  start(ref) {
+    if (!ref) return this.local();
+    this.ref = ref; this.mode = "db";
+    ref.onSnapshot((snap) => {
+      this.items = snap.docs.map(d => ({ ...d.data(), id: d.id })).filter(this.filter).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      this.emit();
+    }, () => this.local());
+  }
+  local() { this.mode = "local"; this.ref = null; this.items = store.get(this.localKey) || []; this.emit(); }
+  on(fn) { this.subs.push(fn); }
+  emit() { this.subs.forEach(fn => fn()); }
+  get(id) { return this.items.find(i => i.id === id); }
+  put(id, data) {
+    if (this.mode === "db") {
+      const { id: _drop, ...body } = data;
+      return (this.q = this.q.catch(() => {}).then(() => this.ref.doc(id).set(body)));
+    }
+    this.items = [{ ...data, id }, ...this.items.filter(i => i.id !== id)].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    store.set(this.localKey, this.items); this.emit();
+    return Promise.resolve();
+  }
+  remove(id) {
+    if (this.mode === "db") return (this.q = this.q.catch(() => {}).then(() => this.ref.doc(id).delete()));
+    this.items = this.items.filter(i => i.id !== id); store.set(this.localKey, this.items); this.emit();
+    return Promise.resolve();
+  }
+}
+const NOTES = new Coll("notes", "notes", (d) => /^n/.test(d.id) && typeof d.text === "string");
+const HL = new Coll("highlights", "c:hl");
+const PR = new Coll("prayers", "c:prayers");
+const PLAN = new Coll("plan", "c:plan");
+const saveWhere = (c) => c.mode === "db" ? "Saved privately to your account." : c.mode === "local" ? "Saved in this browser only." : "";
+async function initStores() {
+  const [db, user] = await Promise.all([use("db"), use("user")]);
+  const id = user ? await user.id().catch(() => null) : null;
+  if (db && id) {
+    const base = "data/users/" + id;
+    const lamp = db.doc(base + "/lamp");
+    NOTES.start(db.collection(base));
+    HL.start(lamp.collection("hl"));
+    PR.start(lamp.collection("prayers"));
+    PLAN.start(lamp.collection("plan"));
+  } else { NOTES.local(); HL.local(); PR.local(); PLAN.local(); }
+}
+NOTES.on(() => renderNotesList());
+HL.on(() => { renderScripture(); if (S.tab === "highlights") renderHighlights(); });
+PR.on(() => renderPrayerList());
+PLAN.on(() => { renderToday(); if (S.tab === "plan") renderPlan(); });
+
+/* ---------- passage loading ---------- */
+async function openPassage(ref) {
+  stopTTS();
+  S.ref = { ...ref };
+  S.cmpKey = null;
+  S.sel.clear(); S.focus = null;
+  const key = pkey();
+  if (key === EX) { S.verses = PS23; renderAll(); return; }
+  const cached = store.get("p:" + key);
+  if (cached) { S.verses = cached; renderAll(); return; }
+  S.verses = []; S.loadingPassage = true; renderAll();
+  if (!sample) {
+    S.loadingPassage = false;
+    $("scripture").innerHTML = `<p class="err">${sampleState === "pending" ? "Still connecting to Claude. Try opening the passage again in a moment." : "Loading new passages needs permission to ask Claude, which isn't available in this view."}</p>`;
+    return;
+  }
+  const range = ref.from ? ` verses ${ref.from}${ref.to && ref.to !== ref.from ? "-" + ref.to : ""}` : " (the whole chapter)";
+  const prompt = `Give the exact text of ${ref.book} chapter ${ref.ch}${range} in the ${TRANS[S.trans]} (${S.trans}), which is in the public domain. Reproduce the wording verbatim as published, including archaic spellings and capitalized LORD, without italics markup, headings or footnotes.
+Return JSON only, in this shape: {"verses":[{"n":1,"text":"..."}]}
+If the reference does not exist, return {"error":"short explanation"}.`;
+  try {
+    const out = await sample.json(prompt, { modelTier: "default" });
+    if (key !== pkey()) return;
+    if (!out || out.error || !Array.isArray(out.verses) || !out.verses.length) throw { code: "_bad", message: out && out.error };
+    S.verses = out.verses.map(v => ({ n: Number(v.n), text: String(v.text) })).filter(v => v.n && v.text);
+    store.set("p:" + key, S.verses);
+  } catch (e) {
+    if (key !== pkey()) return;
+    S.loadingPassage = false;
+    $("scripture").innerHTML = `<p class="err">${e.code === "_bad" ? esc(e.message || "Couldn't find that passage.") : errCopy(e)}</p>`;
+    return;
+  }
+  S.loadingPassage = false;
+  renderAll();
+}
+function stepChapter(dir) {
+  let i = bookIndex(S.ref.book);
+  let ch = S.ref.ch + dir;
+  if (ch < 1) { i = (i - 1 + BOOKS.length) % BOOKS.length; ch = BOOKS[i][1]; }
+  else if (ch > BOOKS[i][1]) { i = (i + 1) % BOOKS.length; ch = 1; }
+  openPassage({ book: BOOKS[i][0], ch, from: null, to: null });
+}
+function gotoRef(text) {
+  const ref = parseRef(text);
+  if (!ref) return;
+  openPassage(ref);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ---------- highlights ---------- */
+const hlId = (book, ch, v) => book.replace(/ /g, "_") + "." + ch + "." + v;
+function hlFor(n) { const h = HL.get(hlId(S.ref.book, S.ref.ch, n)); return h ? h.color : null; }
+async function applyHighlight(color) {
+  const nums = [...S.sel].sort((a, b) => a - b);
+  for (const n of nums) {
+    const id = hlId(S.ref.book, S.ref.ch, n);
+    if (!color) { HL.remove(id).catch(() => {}); continue; }
+    const v = S.verses.find(x => x.n === n);
+    HL.put(id, { book: S.ref.book, ch: S.ref.ch, v: n, color, text: v ? v.text : "", trans: S.trans, createdAt: (HL.get(id) || {}).createdAt || Date.now() }).catch(() => {});
+  }
+  S.sel.clear(); renderScripture();
+}
+
+/* ---------- rendering: scripture ---------- */
+function renderScripture() {
+  $("refTitle").textContent = refLabel(S.ref);
+  $("transTag").textContent = S.trans + " · " + TRANS[S.trans];
+  const el = $("scripture");
+  if (S.loadingPassage) {
+    el.innerHTML = `<p class="loading">Opening ${esc(refLabel(S.ref))}…</p>` + '<div class="skel"></div>'.repeat(6);
+  } else if (S.verses.length) {
+    el.innerHTML = S.verses.map(v => {
+      const h = hlFor(v.n);
+      return `<span class="v${S.sel.has(v.n) ? " sel" : ""}"${h ? ` data-hl="${h}"` : ""} data-n="${v.n}" tabindex="0" role="button" aria-pressed="${S.sel.has(v.n)}"><sup>${v.n}</sup>${esc(v.text)}</span> `;
+    }).join("");
+  }
+  markReading();
+  const n = S.sel.size;
+  $("selbar").hidden = n === 0;
+  $("hint").hidden = n > 0 || !S.verses.length;
+  if (n) {
+    $("selLabel").textContent = (n === 1 ? "Verse " : "Verses ") + versesLabel(S.sel);
+    const anyHl = [...S.sel].some(x => hlFor(x));
+    $("swatches").innerHTML = `<span class="lbl" style="font-weight:500">Highlight as</span>` +
+      COLORS.map(([c, l]) => `<button class="swatch" data-color="${c}"><span class="dot ${c}"></span>${l}</button>`).join("") +
+      (anyHl ? `<button class="swatch" data-color="">Remove</button>` : "");
+  }
+}
+$("scripture").addEventListener("click", (e) => {
+  const v = e.target.closest(".v"); if (!v) return;
+  const n = Number(v.dataset.n);
+  S.sel.has(n) ? S.sel.delete(n) : S.sel.add(n);
+  renderScripture();
+  if (S.tab === "compare") renderCompareTools();
+});
+$("scripture").addEventListener("keydown", (e) => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.closest(".v")) { e.preventDefault(); e.target.click(); }
+});
+$("swatches").addEventListener("click", (e) => { const b = e.target.closest("[data-color]"); if (b) applyHighlight(b.dataset.color || null); });
+$("selClear").onclick = () => { S.sel.clear(); renderScripture(); };
+$("selExplain").onclick = () => { S.focus = [...S.sel].sort((a, b) => a - b); setTab("explain"); };
+$("selAsk").onclick = () => {
+  const label = refLabel(S.ref) + ":" + versesLabel(S.sel);
+  setTab("ask");
+  $("askInput").value = `In ${label}, `;
+  $("askInput").focus();
+};
+$("selNote").onclick = () => { setTab("notes"); setTimeout(() => $("noteText") && $("noteText").focus(), 0); };
+$("selPray").onclick = () => { setTab("prayer"); runPrayer(); };
+
+/* ---------- today strip ---------- */
+const ALLCH = BOOKS.flatMap(([b, n]) => Array.from({ length: n }, (_, i) => [b, i + 1]));
+const chRange = (from, to) => ALLCH.filter(([b]) => bookIndex(b) >= bookIndex(from) && bookIndex(b) <= bookIndex(to));
+const PLANS = {
+  gospels: { name: "The Gospels in 30 days", days: 30, ch: () => chRange("Matthew", "John"), blurb: "Matthew, Mark, Luke and John, about 3 chapters a day." },
+  proverbs: { name: "Proverbs in a month", days: 31, ch: () => chRange("Proverbs", "Proverbs"), blurb: "One chapter of wisdom a day." },
+  psalms: { name: "Psalms in 30 days", days: 30, ch: () => chRange("Psalms", "Psalms"), blurb: "Five psalms a day." },
+  nt90: { name: "New Testament in 90 days", days: 90, ch: () => chRange("Matthew", "Revelation"), blurb: "All 260 chapters, about 3 a day." },
+  year: { name: "The whole Bible in a year", days: 365, ch: () => ALLCH, blurb: "Genesis to Revelation, 3 or 4 chapters a day." },
+};
+function planDay(planId, d) {
+  const p = PLANS[planId], c = p.ch(), N = c.length, D = p.days;
+  return c.slice(Math.floor(d * N / D), Math.floor((d + 1) * N / D));
+}
+function readingLabel(chs) {
+  const out = [];
+  for (const [b, c] of chs) {
+    const last = out[out.length - 1];
+    if (last && last.b === b && last.to === c - 1) last.to = c; else out.push({ b, from: c, to: c });
+  }
+  return out.map(x => (x.b === "Psalms" && x.from !== x.to ? "Psalms" : bookLabel(x.b)) + " " + x.from + (x.to !== x.from ? "–" + x.to : "")).join(", ");
+}
+function planStatus() {
+  const p = PLAN.get("current");
+  if (!p || !PLANS[p.planId]) return null;
+  const def = PLANS[p.planId];
+  const done = p.done || {};
+  let next = 0; while (next < def.days && done[next]) next++;
+  const doneCount = Object.keys(done).length;
+  const expected = Math.min(daysBetween(p.start, todayYmd()) + 1, def.days);
+  const dates = new Set(Object.values(done));
+  const d = new Date(); if (!dates.has(ymd(d))) d.setDate(d.getDate() - 1);
+  let streak = 0; while (dates.has(ymd(d))) { streak++; d.setDate(d.getDate() - 1); }
+  return { p, def, done, next, doneCount, behind: Math.max(0, expected - doneCount), streak, readToday: dates.has(todayYmd()), finished: doneCount >= def.days };
+}
+function chapterChips(chs) {
+  return `<span class="chapchips">` + chs.map(([b, c]) => {
+    const here = S.ref.book === b && S.ref.ch === c;
+    return `<button class="chapchip${here ? " here" : ""}" data-goto="${esc(bookLabel(b) + " " + c)}">${esc(bookLabel(b) + " " + c)}</button>`;
+  }).join("") + `</span>`;
+}
+function statPills(st) {
+  const out = [];
+  if (st.streak) out.push(`<span class="pill good">${st.streak}-day streak</span>`);
+  if (st.finished) out.push(`<span class="pill good">Plan complete</span>`);
+  else if (st.behind - (st.readToday ? 0 : 1) > 0) { const lag = st.behind - (st.readToday ? 0 : 1); out.push(`<span class="pill warn">${lag} day${lag > 1 ? "s" : ""} behind</span>`); }
+  else out.push(`<span class="pill">On track</span>`);
+  return out.join("");
+}
+function renderToday() {
+  const el = $("today");
+  if (PLAN.mode === "pending") { el.innerHTML = `<span class="t-label">Today</span><span class="grow muted">Loading your reading plan…</span>`; return; }
+  const st = planStatus();
+  if (!st) {
+    el.innerHTML = `<span class="t-label">Today</span><span class="grow muted">Read a little every day. Pick a plan and Daily Bread will set out each day's chapters.</span><button class="btn small" data-open-tab="plan">Choose a reading plan</button>`;
+    return;
+  }
+  if (st.finished) {
+    el.innerHTML = `<span class="t-label">Reading plan</span><span class="grow"><span class="plan-name">${esc(st.def.name)}</span> · all ${st.def.days} days read.</span>${statPills(st)}<button class="btn small" data-open-tab="plan">Start another</button>`;
+    return;
+  }
+  const chs = planDay(st.p.planId, st.next);
+  const lead = st.readToday ? `Done for today. Read ahead: Day ${st.next + 1}` : `Day ${st.next + 1} of ${st.def.days}`;
+  el.innerHTML = `<span class="t-label">Today</span>
+    <span class="grow"><span class="plan-name">${lead}</span> <span class="muted">· ${esc(st.def.name)}</span></span>
+    ${chapterChips(chs)}
+    ${statPills(st)}
+    <button class="btn small" data-open-tab="reflect">Today's reflection</button>
+    <button class="btn small ${st.readToday ? "" : "good"}" data-markday="${st.next}">Mark day ${st.next + 1} read</button>`;
+}
+async function setDay(idx, read) {
+  const st = planStatus(); if (!st) return;
+  const done = { ...st.done };
+  if (read) done[idx] = todayYmd(); else delete done[idx];
+  try { await PLAN.put("current", { planId: st.p.planId, start: st.p.start, done, createdAt: st.p.createdAt || Date.now() }); } catch {}
+}
+$("today").addEventListener("click", (e) => {
+  const g = e.target.closest("[data-goto]"); if (g) { gotoRef(g.dataset.goto); return; }
+  const m = e.target.closest("[data-markday]"); if (m) { setDay(Number(m.dataset.markday), true); return; }
+  const t = e.target.closest("[data-open-tab]"); if (t) setTab(t.dataset.openTab);
+});
+
+/* ---------- tabs ---------- */
+function renderTabs() {
+  const g = groupOf(S.tab);
+  $("groups").innerHTML = GROUPS.map(([id, label]) => `<button data-group="${id}" aria-pressed="${g === id}">${label}</button>`).join("");
+  $("tabs").innerHTML = TABS.filter(t => t[2] === g).map(([id, label]) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${S.tab === id}">${label}</button>`).join("");
+}
+$("tabs").addEventListener("click", (e) => { const t = e.target.closest(".tab"); if (t) setTab(t.dataset.tab); });
+$("groups").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-group]"); if (!b) return;
+  const g = b.dataset.group; if (g === groupOf(S.tab)) return;
+  const last = store.get("tab:" + g);
+  setTab(last && groupOf(last) === g ? last : TABS.find(t => t[2] === g)[0]);
+});
+function setTab(id) {
+  S.tab = id; store.set("tab", id); store.set("tab:" + groupOf(id), id);
+  renderTabs(); renderPane();
+  if (window.innerWidth <= 860) $("tabs").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function rkey(tab) {
+  if (tab === "explain") return pkey() + "|explain|" + S.depth + "|" + (S.focus ? S.focus.join(",") : "");
+  return pkey() + "|" + tab;
+}
+
+const STUDY_RULES = `You are a careful, warm Bible study companion for an ordinary reader. Be accurate and grounded in the text and its historical setting. Where Christian traditions read something differently, say so briefly and fairly rather than taking sides. Write in plain modern English. Do not add a preamble or closing offer.`;
+
+function promptFor(tab) {
+  const head = `${STUDY_RULES}\n\nPassage: ${refLabel(S.ref)} (${S.trans})\n${passageText()}\n\n`;
+  if (tab === "explain") {
+    const focus = S.focus ? `Focus only on verse${S.focus.length > 1 ? "s" : ""} ${versesLabel(S.focus)}, using the rest of the passage as context. ` : "";
+    const depth = S.depth === "deeper"
+      ? "Go deeper: point out notable Hebrew or Greek wording, literary structure, and important interpretive questions, while staying readable. "
+      : "Keep it simple, as if explaining to a friend new to the Bible. ";
+    return head + `Task: explain what this passage means. ${focus}${depth}Work through it in sections by verse range, each starting with a heading line like "### v. 1–3 · short title", followed by 2–4 sentences. Finish with "### The big idea" and one or two sentences. Use only ### headings, paragraphs, and *italics* or **bold** for emphasis.`;
+  }
+  if (tab === "context") {
+    return head + `Task: give the background a reader needs to understand this passage. Use these ### headings in order, 2–4 sentences each: "### Who wrote it", "### Who it was written to", "### When and where", "### What kind of writing", "### What comes just before and after", "### Where it sits in the big story". Name specific references where useful. Use only ### headings and paragraphs.`;
+  }
+  if (tab === "words") {
+    return head + `Task: pick the 5–8 most important words in this passage for understanding it, and explain the original-language word behind each. Return JSON only: {"words":[{"english":"word as it appears in the ${S.trans}","original":"Hebrew or Greek word in its own script","translit":"transliteration","strongs":"Strong's number like H7462 or G26","meaning":"1–2 plain sentences on its meaning and how it is used elsewhere"}]}`;
+  }
+  if (tab === "xref") {
+    return head + `Task: list 6–10 of the most helpful cross-references for this passage: quotations, allusions, parallel accounts, and passages on the same theme across both Testaments. Return JSON only: {"refs":[{"from":"v. 3","ref":"Book chapter:verse or chapter:verse-verse using full English book names","why":"one sentence on the connection"}]}`;
+  }
+  if (tab === "people") {
+    return head + `Task: list the people (and God, if named) and the places that appear in or matter to this passage. For each person give who they are and their story up to this point in the Bible. For each place say what it is and where it is today. Return JSON only: {"people":[{"name":"...","who":"one line","story":"2–4 plain sentences","refs":["2–4 key references with full English book names"]}],"places":[{"name":"...","what":"one line","today":"where it is today, with distance from a well-known city if useful","refs":["..."]}]}. Use empty arrays when there are none.`;
+  }
+  if (tab === "questions") {
+    return head + `Task: write study questions using the inductive method. 3–4 questions per step, short and open-ended, specific to this passage. Return JSON only: {"observation":["what does the text say"],"interpretation":["what does it mean"],"application":["how does it apply to my life"]}`;
+  }
+}
+
+let ctl = null;
+async function run(tab, force) {
+  const key = rkey(tab);
+  const have = results.get(key);
+  if (have && !force && have.status !== "error") return;
+  if (!sample || !S.verses.length) return;
+  ctl && ctl.abort();
+  ctl = new AbortController();
+  const r = { status: "thinking", text: "" };
+  results.set(key, r);
+  renderPane();
+  try {
+    if (tab === "words" || tab === "xref" || tab === "questions" || tab === "people") {
+      r.data = await sample.json(promptFor(tab), { signal: ctl.signal });
+    } else {
+      const out = await sample(promptFor(tab), {
+        signal: ctl.signal,
+        onText: ({ text }) => { r.text = text; r.status = "streaming"; if (rkey(S.tab) === key) paintStream(r); }
+      });
+      r.text = out.text;
+    }
+    r.status = "done";
+  } catch (e) {
+    if (e && e.code === "cancelled") { results.delete(key); return; }
+    r.status = "error"; r.error = errCopy(e); r.text = (e && e.text) || "";
+  }
+  if (rkey(S.tab) === key) renderPane();
+}
+function paintStream(r) {
+  const body = $("streamBody");
+  if (body) body.innerHTML = md(r.text);
+  else renderPane();
+}
+
+/* tiny markdown: ### headings, - bullets, paragraphs, **bold**, *italic* */
+function md(src) {
+  const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\*(.+?)\*/g, "<em>$1</em>");
+  const out = []; let list = null; let para = [];
+  const flush = () => { if (para.length) { out.push("<p>" + inline(para.join(" ")) + "</p>"); para = []; } if (list) { out.push("<ul>" + list.map(li => "<li>" + inline(li) + "</li>").join("") + "</ul>"); list = null; } };
+  for (const line of String(src || "").split("\n")) {
+    const t = line.trim();
+    if (!t) { flush(); continue; }
+    const h = t.match(/^#{1,4}\s+(.*)$/);
+    if (h) { flush(); out.push("<h3>" + inline(h[1]) + "</h3>"); continue; }
+    const b = t.match(/^[-*•]\s+(.*)$/) || t.match(/^\d+[.)]\s+(.*)$/);
+    if (b) { if (para.length) { out.push("<p>" + inline(para.join(" ")) + "</p>"); para = []; } (list = list || []).push(b[1]); continue; }
+    if (list) flush();
+    para.push(t);
+  }
+  flush();
+  return out.join("");
+}
+
+const exampleTag = '<p><span class="example">Example · Psalm 23</span></p>';
+function statusBlock(r) {
+  if (sampleState === "off" && !r) return NO_CLAUDE;
+  if (!r) return `<p class="empty">Preparing…</p>`;
+  if (r.status === "thinking") return `<div class="thinking">Thinking… <button class="btn small" data-stop>Stop</button></div>`;
+  if (r.status === "error") return (r.text ? `<div class="prose">${md(r.text)}</div>` : "") + `<p class="err">${esc(r.error)}</p><button class="btn small" id="retryBtn">Try again</button>`;
+  return null;
+}
+
+function renderPane() {
+  const pane = $("pane"), tools = $("paneTools");
+  const sermonMode = S.tab === "sermon";
+  $("sermonRoot").hidden = !sermonMode; pane.hidden = sermonMode; $("tabs").hidden = sermonMode;
+  document.querySelector(".desk").classList.toggle("sermon-mode", sermonMode);
+  if (sermonMode) { tools.hidden = true; $("askForm").hidden = true; window.dispatchEvent(new Event("sermon:show")); return; }
+  $("askForm").hidden = S.tab !== "ask";
+  tools.innerHTML = ""; tools.hidden = true;
+  const special = { notes: renderNotes, ask: renderAsk, plan: renderPlan, highlights: renderHighlights, prayer: renderPrayer, topics: renderTopics, reflect: renderReflect, compare: renderCompare };
+  if (special[S.tab]) { special[S.tab](); return; }
+  if (!S.verses.length) { pane.innerHTML = `<p class="empty">Open a passage to start studying.</p>`; return; }
+
+  const key = rkey(S.tab);
+  let r = results.get(key);
+  if (!r && sample) { run(S.tab); r = results.get(key); }
+
+  const bits = [];
+  if (S.tab === "explain") {
+    bits.push(`<span class="grow">${S.focus ? "Focused on v. " + versesLabel(S.focus) + ` · <button class="link" id="wholeBtn">Whole passage</button>` : "Whole passage"}</span>`);
+    bits.push(`<span class="seg" role="group" aria-label="Depth"><button data-depth="plain" aria-pressed="${S.depth === "plain"}">Simple</button><button data-depth="deeper" aria-pressed="${S.depth === "deeper"}">Deeper</button></span>`);
+  } else bits.push(`<span class="grow"></span>`);
+  if (r && r.status === "done" && sample) bits.push(`<button class="btn small" id="redoBtn">${r.example ? "Ask Claude fresh" : "Regenerate"}</button>`);
+  tools.innerHTML = bits.join(""); tools.hidden = false;
+
+  const st = statusBlock(r);
+  const ex = r && r.example ? exampleTag : "";
+  if (st) { pane.innerHTML = st; }
+  else if (S.tab === "explain" || S.tab === "context") {
+    pane.innerHTML = ex + `<div class="prose" id="streamBody">${md(r.text)}</div>`;
+  } else if (r.status === "streaming") {
+    pane.innerHTML = `<div class="thinking">Thinking…</div>`;
+  } else if (S.tab === "words") {
+    const w = (r.data && r.data.words) || [];
+    pane.innerHTML = ex + `<div class="words">` + w.map(x => `
+      <div class="word">
+        <div><span class="en">${esc(x.english)}</span> · <span class="orig" lang="${/^G/i.test(x.strongs || "") ? "grc" : "he"}">${esc(x.original)}</span> <span class="tl">${esc(x.translit)}</span></div>
+        <span class="num">${esc(x.strongs)}</span>
+        <div class="mean">${esc(x.meaning)}</div>
+      </div>`).join("") + `</div>`;
+  } else if (S.tab === "xref") {
+    const refs = (r.data && r.data.refs) || [];
+    pane.innerHTML = ex + `<div class="xrefs">` + refs.map(x => `
+      <div class="xref"><span class="from">${esc(x.from)}</span>
+        <button class="link" data-goto="${esc(x.ref)}">${esc(x.ref)}</button>
+        <span class="why">${esc(x.why)}</span></div>`).join("") + `</div>
+      <p class="hint">Tap a reference to open it. Prev and Next or the Go to box bring you back.</p>`;
+  } else if (S.tab === "people") {
+    const d = r.data || {};
+    const refs = (a) => (a && a.length) ? `<div class="refs">` + a.map(x => `<button class="link" data-goto="${esc(x)}">${esc(x)}</button>`).join("") + `</div>` : "";
+    const people = (d.people || []).map(p => `<div class="pp-item"><span class="nm">${esc(p.name)}</span><span class="who">${esc(p.who)}</span><div>${esc(p.story)}</div>${refs(p.refs)}</div>`).join("");
+    const places = (d.places || []).map(p => `<div class="pp-item"><span class="nm">${esc(p.name)}</span><span class="who">${esc(p.what)}</span>${p.today ? `<div><strong>Today:</strong> ${esc(p.today)}</div>` : ""}${refs(p.refs)}</div>`).join("");
+    pane.innerHTML = ex +
+      (people ? `<h3 class="sec-h">People</h3><div class="pp">${people}</div>` : "") +
+      (places ? `<h3 class="sec-h" style="margin-top:18px">Places</h3><div class="pp">${places}</div>` : "") +
+      (!people && !places ? `<p class="empty">No particular people or places stand out in this passage.</p>` : "") +
+      `<div class="lookup"><h3 class="sec-h">Look up anyone or anywhere in the Bible</h3>
+        <form class="topic-form" id="lookupForm"><input id="lookupInput" type="text" placeholder="e.g. Ruth, Nineveh, Barnabas, the Jordan" aria-label="Person or place"><button class="btn primary" type="submit">Look up</button></form>
+        <div id="lookupBox" style="margin-top:12px"></div></div>`;
+    renderLookup();
+  } else if (S.tab === "questions") {
+    const d = r.data || {};
+    const group = (k, title) => (d[k] && d[k].length) ? `<div class="qgroup"><h3 class="sec-h">${title}</h3><ol>` + d[k].map(q => `<li>${esc(q)} <button class="btn small" data-answer="${esc(q)}">Answer in notes</button></li>`).join("") + `</ol></div>` : "";
+    pane.innerHTML = ex + group("observation", "Observe · what does it say?") + group("interpretation", "Interpret · what does it mean?") + group("application", "Apply · what does it mean for me?");
+  }
+}
+$("paneTools").addEventListener("click", (e) => {
+  const d = e.target.closest("[data-depth]");
+  if (d) { S.depth = d.dataset.depth; store.set("depth", S.depth); renderPane(); return; }
+  if (e.target.id === "wholeBtn") { S.focus = null; renderPane(); return; }
+  if (e.target.id === "redoBtn") { run(S.tab, true); return; }
+  if (e.target.id === "cmpBtn") { startCompare(); }
+});
+
+/* ---------- Ask ---------- */
+const CHIPS = ["What is the main point here?", "How does this point to Jesus?", "What was happening when this was written?", "How can I pray through this passage?", "What's confusing about this passage for most readers?"];
+function chatTurns() { const k = pkey(); if (!S.chats.has(k)) S.chats.set(k, []); return S.chats.get(k); }
+function renderAsk() {
+  const pane = $("pane");
+  const turns = chatTurns();
+  if (sampleState === "off") { pane.innerHTML = NO_CLAUDE; $("askForm").hidden = true; return; }
+  let html = `<div class="chat">`;
+  if (!turns.length) html += `<p class="empty">Ask anything about ${esc(refLabel(S.ref))}. Your conversation stays with this passage while the page is open.</p><div class="chips">` + CHIPS.map(c => `<button class="chip" data-chip="${esc(c)}">${esc(c)}</button>`).join("") + `</div>`;
+  for (const t of turns) html += t.role === "user" ? `<div class="msg-u">${esc(t.content)}</div>` : `<div class="prose">${md(t.content)}</div>`;
+  if (S.asking) html += `<div class="prose" id="streamBody">${S.askText ? md(S.askText) : '<div class="thinking">Thinking… <button class="btn small" data-stop>Stop</button></div>'}</div>`;
+  if (S.askError) html += `<p class="err">${esc(S.askError)}</p>`;
+  html += `</div>`;
+  pane.innerHTML = html;
+  pane.scrollTop = pane.scrollHeight;
+}
+async function sendAsk() {
+  const q = $("askInput").value.trim();
+  if (!q || S.asking || !sample) return;
+  const turns = chatTurns();
+  const key = pkey();
+  turns.push({ role: "user", content: q });
+  $("askInput").value = "";
+  S.asking = true; S.askText = ""; S.askError = "";
+  renderAsk();
+  const intro = `${STUDY_RULES} Answer the reader's questions about this passage in a few short paragraphs. Cite verses by number. If a question goes beyond what the Bible says, say so plainly.\n\nPassage: ${refLabel(S.ref)} (${S.trans})\n${passageText()}`;
+  const input = [{ role: "user", content: intro + "\n\nFirst question: " + turns[0].content }, ...turns.slice(1)];
+  ctl && ctl.abort(); ctl = new AbortController();
+  try {
+    const out = await sample(input, { cache: false, signal: ctl.signal, onText: ({ text }) => { S.askText = text; if (S.tab === "ask" && pkey() === key) { const b = $("streamBody"); if (b) b.innerHTML = md(text); } } });
+    turns.push({ role: "assistant", content: out.text });
+  } catch (e) {
+    if (e && e.code !== "cancelled") S.askError = errCopy(e);
+    if (e && e.text) turns.push({ role: "assistant", content: e.text });
+    else turns.pop();
+  }
+  S.asking = false; S.askText = "";
+  if (S.tab === "ask") renderAsk();
+}
+$("askForm").addEventListener("submit", (e) => { e.preventDefault(); sendAsk(); });
+$("askInput").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendAsk(); } });
+
+/* ---------- Reading plan ---------- */
+function renderPlan() {
+  const pane = $("pane");
+  if (PLAN.mode === "pending") { pane.innerHTML = `<p class="empty">Loading your reading plan…</p>`; return; }
+  const st = planStatus();
+  if (!st) {
+    pane.innerHTML = `<h3 class="sec-h">Choose a reading plan</h3><div class="plans">` +
+      Object.entries(PLANS).map(([id, p]) => `<div class="plan-card"><h4>${esc(p.name)}</h4><p>${esc(p.blurb)} ${p.days} days.</p><button class="btn small primary" data-startplan="${id}">Start today</button></div>`).join("") +
+      `</div><p class="store-note" style="margin-top:12px">${saveWhere(PLAN)} The plan is self-paced: if you miss a day, it waits for you.</p>`;
+    return;
+  }
+  const pct = Math.round(st.doneCount / st.def.days * 100);
+  const picked = S.pickedDay != null && S.pickedDay < st.def.days ? S.pickedDay : Math.min(st.next, st.def.days - 1);
+  const chs = planDay(st.p.planId, picked);
+  const isDone = !!st.done[picked];
+  pane.innerHTML = `
+    <div class="row" style="display:flex;flex-wrap:wrap;gap:8px;align-items:baseline">
+      <h3 style="margin:0;font-family:var(--f-scripture);font-size:1.2rem" class="grow">${esc(st.def.name)}</h3>
+      <span class="muted" style="font-size:.85rem">Started ${esc(fmtDate(st.p.start))}</span>
+    </div>
+    <div class="progress" aria-label="${pct}% complete"><i style="width:${pct}%"></i></div>
+    <div class="stats"><span class="pill">${st.doneCount} of ${st.def.days} days read · ${pct}%</span>${statPills(st)}</div>
+    <div class="days" role="list">` +
+    Array.from({ length: st.def.days }, (_, i) => `<button class="day${st.done[i] ? " done" : ""}${i === st.next ? " next" : ""}${i === picked ? " picked" : ""}" data-pickday="${i}" title="Day ${i + 1}: ${esc(readingLabel(planDay(st.p.planId, i)))}${st.done[i] ? " (read)" : ""}">${i + 1}</button>`).join("") +
+    `</div>
+    <div class="daydetail">
+      <div class="row" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <strong class="grow">Day ${picked + 1}</strong>
+        ${isDone ? `<span class="pill good">Read ${esc(fmtDate(st.done[picked]))}</span><button class="btn small" data-unmark="${picked}">Mark unread</button>` : `<button class="btn small good" data-markday="${picked}">Mark read</button>`}
+      </div>
+      ${chapterChips(chs)}
+    </div>
+    <div class="row" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px">
+      <span class="store-note grow">${saveWhere(PLAN)}</span>
+      <span id="endPlan"><button class="btn small" data-endplan>Stop this plan</button></span>
+    </div>`;
+}
+async function startPlan(id) {
+  S.pickedDay = null;
+  try { await PLAN.put("current", { planId: id, start: todayYmd(), done: {}, createdAt: Date.now() }); } catch {}
+}
+
+/* ---------- Highlights ---------- */
+function renderHighlights() {
+  const pane = $("pane");
+  const items = HL.items.filter(h => S.hlFilter === "all" || h.color === S.hlFilter)
+    .sort((a, b) => bookIndex(a.book) - bookIndex(b.book) || a.ch - b.ch || a.v - b.v);
+  const counts = Object.fromEntries(COLORS.map(([c]) => [c, HL.items.filter(h => h.color === c).length]));
+  let html = `<div class="row" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px">
+    <span class="seg" role="group" aria-label="Filter highlights">
+      <button data-hlf="all" aria-pressed="${S.hlFilter === "all"}">All ${HL.items.length}</button>` +
+      COLORS.map(([c, l]) => `<button data-hlf="${c}" aria-pressed="${S.hlFilter === c}"><span class="dot ${c}"></span>${l} ${counts[c]}</button>`).join("") +
+    `</span></div>`;
+  if (!HL.items.length) html += `<p class="empty">No highlights yet. Tap a verse in the reading, then pick a colour: Promise, Command, Question or Key verse.</p>`;
+  else if (!items.length) html += `<p class="empty">No highlights in this colour yet.</p>`;
+  else html += `<div class="list">` + items.map(h => `
+    <div class="entry">
+      <div class="meta"><span class="dot ${esc(h.color)}"></span><button class="link grow" data-goto="${esc(bookLabel(h.book) + " " + h.ch)}">${esc(bookLabel(h.book) + " " + h.ch + ":" + h.v)}</button>
+        <span>${esc(h.trans || "")}</span><button class="btn small" data-unhl="${esc(h.id)}">Remove</button></div>
+      <div class="vtext" style="background:var(--c-${esc(h.color)})">${esc(h.text)}</div>
+    </div>`).join("") + `</div>`;
+  html += `<p class="store-note" style="margin-top:14px">${saveWhere(HL)}</p>`;
+  pane.innerHTML = html;
+}
+
+/* ---------- Notes ---------- */
+function renderNotes() {
+  const pane = $("pane");
+  const where = refLabel({ ...S.ref, from: null }) + (S.sel.size ? ":" + versesLabel(S.sel) : "");
+  const pre = S.pendingNote || ""; S.pendingNote = "";
+  pane.innerHTML = `
+    <form class="form" id="noteForm">
+      <label for="noteText" class="store-note">New note on <strong>${esc(where)}</strong></label>
+      <textarea id="noteText" placeholder="What stood out to you? A question, something to come back to…">${esc(pre)}</textarea>
+      <div class="row"><span class="grow" id="noteWhere">${saveWhere(NOTES)}</span><button class="btn primary" type="submit">Save note</button></div>
+    </form>
+    <div class="pane-tools" style="padding:14px 0 10px"><span class="grow"></span>
+      <span class="seg" role="group" aria-label="Which notes"><button data-nf="here" aria-pressed="${S.notesFilter === "here"}">This chapter</button><button data-nf="all" aria-pressed="${S.notesFilter === "all"}">All notes</button></span></div>
+    <div class="list" id="notesList"></div>`;
+  renderNotesList();
+  if (pre) { const t = $("noteText"); t.focus(); t.setSelectionRange(t.value.length, t.value.length); }
+}
+function renderNotesList() {
+  const el = $("notesList"); if (!el) return;
+  const w = $("noteWhere"); if (w) w.textContent = saveWhere(NOTES);
+  const chapter = bookLabel(S.ref.book) + " " + S.ref.ch;
+  const list = S.notesFilter === "here" ? NOTES.items.filter(n => n.ref === chapter || String(n.ref).startsWith(chapter + ":")) : NOTES.items;
+  if (!list.length) { el.innerHTML = `<p class="empty">${S.notesFilter === "here" ? "No notes on " + esc(chapter) + " yet. Write one above." : "No notes yet. Write one above."}</p>`; return; }
+  el.innerHTML = list.map(n => `
+    <div class="entry">
+      <div class="meta"><button class="link grow" data-goto="${esc(n.ref)}">${esc(n.ref)}</button>
+        <span>${esc(fmtDate(n.createdAt))}</span>
+        <span><button class="btn small" data-del="notes:${esc(n.id)}">Delete</button></span></div>
+      <div class="body">${esc(n.text)}</div>
+    </div>`).join("");
+}
+
+/* ---------- Prayer journal ---------- */
+function prayerKey() { return pkey() + "|prayer|" + (S.sel.size ? versesLabel(S.sel) : ""); }
+function renderPrayer() {
+  const pane = $("pane");
+  const where = refLabel({ ...S.ref, from: null }) + (S.sel.size ? ":" + versesLabel(S.sel) : "");
+  const r = results.get(prayerKey());
+  let guided;
+  if (!r) guided = `<p class="muted" style="margin:0 0 10px">Turn ${esc(where)} into a short prayer in four parts: praise, confession, thanks, and asking.</p>
+      <button class="btn primary" id="prayBtn" ${sample && S.verses.length ? "" : "disabled"}>Write a prayer from ${esc(where)}</button>${sampleState === "off" ? NO_CLAUDE : ""}`;
+  else if (r.status === "thinking") guided = `<div class="thinking">Writing a prayer… <button class="btn small" data-stop>Stop</button></div>`;
+  else if (r.status === "error") guided = `<p class="err">${esc(r.error)}</p><button class="btn small" id="prayBtn">Try again</button>`;
+  else guided = `<div class="prose" id="streamBody">${md(r.text)}</div>` + (r.status === "done" ? `<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small primary" id="savePrayer" ${r.saved ? "disabled" : ""}>${r.saved ? "Saved to journal" : "Save to journal"}</button><button class="btn small" id="prayBtn">Write another</button></div>` : "");
+  pane.innerHTML = `
+    <div class="sec"><h3 class="sec-h">Pray this passage</h3>${guided}</div>
+    <div class="sec">
+      <h3 class="sec-h">Prayer journal</h3>
+      <form class="form" id="prayerForm">
+        <textarea id="prayerText" placeholder="What are you praying about? A request, a person, a worry, a thank-you…"></textarea>
+        <div class="row">
+          <label class="check grow"><input type="checkbox" id="prayerLink" checked> Link to ${esc(where)}</label>
+          <button class="btn primary" type="submit">Add to journal</button>
+        </div>
+      </form>
+      <div class="pane-tools" style="padding:14px 0 10px"><span class="grow store-note" id="prayerWhere">${saveWhere(PR)}</span>
+        <span class="seg" role="group" aria-label="Which prayers"><button data-prf="open" aria-pressed="${S.prFilter === "open"}">Praying</button><button data-prf="answered" aria-pressed="${S.prFilter === "answered"}">Answered</button><button data-prf="all" aria-pressed="${S.prFilter === "all"}">All</button></span></div>
+      <div class="list" id="prayerList"></div>
+    </div>`;
+  renderPrayerList();
+}
+function renderPrayerList() {
+  const el = $("prayerList"); if (!el) return;
+  const w = $("prayerWhere"); if (w) w.textContent = saveWhere(PR);
+  const list = PR.items.filter(p => S.prFilter === "all" || (S.prFilter === "answered" ? p.answered : !p.answered));
+  if (!list.length) {
+    el.innerHTML = `<p class="empty">${S.prFilter === "answered" ? "No answered prayers recorded yet. When one is answered, tap Mark answered to remember how." : "Nothing here yet. Add a prayer above, or save a prayer written from a passage."}</p>`;
+    return;
+  }
+  el.innerHTML = list.map(p => `
+    <div class="entry">
+      <div class="meta">
+        ${p.ref ? `<button class="link" data-goto="${esc(p.ref)}">${esc(p.ref)}</button>` : ""}
+        <span class="grow">${esc(fmtDate(p.createdAt))}</span>
+        ${p.answered ? `<span class="pill good">Answered ${esc(fmtDate(p.answeredAt))}</span>` : `<button class="btn small" data-answering="${esc(p.id)}">Mark answered</button>`}
+        <span><button class="btn small" data-del="prayers:${esc(p.id)}">Delete</button></span>
+      </div>
+      <div class="body ${p.guided ? "prose" : ""}">${p.guided ? md(p.text) : esc(p.text)}</div>
+      ${p.answered && p.answerNote ? `<div class="answer">${esc(p.answerNote)}</div>` : ""}
+      ${S.answering === p.id ? `<form class="form" data-answerform="${esc(p.id)}"><input type="text" id="answerText" placeholder="How was it answered? (optional)"><div class="row"><span class="grow"></span><button class="btn small" type="button" data-answercancel>Cancel</button><button class="btn small good" type="submit">Save</button></div></form>` : ""}
+    </div>`).join("");
+  if (S.answering) { const a = $("answerText"); if (a) a.focus(); }
+}
+async function runPrayer() {
+  if (!sample || !S.verses.length) { renderPane(); return; }
+  const key = prayerKey();
+  const focus = S.sel.size ? `Draw especially on verse${S.sel.size > 1 ? "s" : ""} ${versesLabel(S.sel)}. ` : "";
+  const prompt = `${STUDY_RULES}\n\nPassage: ${refLabel(S.ref)} (${S.trans})\n${passageText()}\n\nTask: write a short guided prayer drawn from this passage, in the first person, warm and simple, echoing its words. ${focus}Use four parts with these ### headings: "### Praise", "### Confession", "### Thanks", "### Asking". 2–3 sentences each. End with "Amen." on its own line.`;
+  ctl && ctl.abort(); ctl = new AbortController();
+  const r = { status: "thinking", text: "", ref: refLabel({ ...S.ref, from: null }) + (S.sel.size ? ":" + versesLabel(S.sel) : "") };
+  results.set(key, r);
+  if (S.tab === "prayer") renderPrayer();
+  try {
+    const out = await sample(prompt, { cache: false, signal: ctl.signal, onText: ({ text }) => {
+      r.text = text;
+      if (r.status !== "streaming") { r.status = "streaming"; if (S.tab === "prayer") renderPrayer(); }
+      else { const b = $("streamBody"); if (b && S.tab === "prayer") b.innerHTML = md(text); }
+    } });
+    r.text = out.text; r.status = "done";
+  } catch (e) {
+    if (e && e.code === "cancelled") { results.delete(key); if (S.tab === "prayer") renderPrayer(); return; }
+    r.status = "error"; r.error = errCopy(e);
+  }
+  if (S.tab === "prayer") renderPrayer();
+}
+
+/* ---------- Topics ---------- */
+const TOPIC_CHIPS = ["Forgiveness", "Anxiety and worry", "Grief", "Money", "Anger", "Hope", "Marriage", "Prayer", "Temptation", "God's love"];
+const topicCache = new Map(Object.entries(store.get("topics") || {}));
+function renderTopics() {
+  const pane = $("pane");
+  const recent = [...topicCache.keys()].slice(-6).reverse();
+  const r = S.topic ? topicCache.get(S.topic.toLowerCase()) || S.topicRun : null;
+  let body = "";
+  if (!S.topic) {
+    body = `<h3 class="sec-h" style="margin-top:16px">Try one</h3><div class="chips">` + TOPIC_CHIPS.map(c => `<button class="chip" data-topic="${esc(c)}">${esc(c)}</button>`).join("") + `</div>` +
+      (recent.length ? `<h3 class="sec-h" style="margin-top:16px">Your recent searches</h3><div class="chips">` + recent.map(k => `<button class="chip" data-topic="${esc(topicCache.get(k).topic)}">${esc(topicCache.get(k).topic)}</button>`).join("") + `</div>` : "");
+    if (sampleState === "off") body += NO_CLAUDE;
+  } else if (!r || r.status === "thinking") {
+    body = `<div class="thinking" style="margin-top:16px">Searching the Scriptures for “${esc(S.topic)}”… <button class="btn small" data-stop>Stop</button></div>`;
+  } else if (r.status === "error") {
+    body = `<p class="err" style="margin-top:16px">${esc(r.error)}</p><button class="btn small" data-topic="${esc(S.topic)}">Try again</button>`;
+  } else {
+    const d = r.data || {};
+    body = `<div class="row" style="display:flex;gap:8px;align-items:center;margin-top:16px"><h3 class="grow" style="margin:0;font-family:var(--f-scripture);font-size:1.2rem">${esc(r.topic)}</h3><button class="btn small" data-topicclear>New search</button></div>` +
+      (d.summary ? `<p class="prose" style="margin:8px 0 0">${esc(d.summary)}</p>` : "") +
+      (d.groups || []).map(g => `<div class="tgroup"><h4>${esc(g.heading)}</h4><ul>` + (g.passages || []).map(p => `<li><button class="link" data-goto="${esc(p.ref)}">${esc(p.ref)}</button><span class="muted">${esc(p.gist)}</span></li>`).join("") + `</ul></div>`).join("");
+  }
+  pane.innerHTML = `<form class="topic-form" id="topicForm"><input id="topicInput" type="text" placeholder="What does the Bible say about…" aria-label="Topic" value="${esc(S.topic && (!r || r.status !== "done") ? S.topic : "")}"><button class="btn primary" type="submit">Search</button></form>` + body;
+}
+async function searchTopic(topic) {
+  topic = topic.trim(); if (!topic) return;
+  S.topic = topic;
+  const k = topic.toLowerCase();
+  if (topicCache.has(k)) { renderTopics(); return; }
+  if (!sample) { S.topic = null; renderTopics(); return; }
+  ctl && ctl.abort(); ctl = new AbortController();
+  const run = S.topicRun = { status: "thinking", topic };
+  renderTopics();
+  const prompt = `${STUDY_RULES}\n\nA reader asks: what does the Bible say about "${topic}"?\nReturn JSON only: {"summary":"2–3 sentences giving the overall biblical picture, fair to the range of Christian views","groups":[{"heading":"short theme","passages":[{"ref":"Book chapter:verse or chapter:verse-verse with full English book names","gist":"one plain sentence on what this passage says about the topic"}]}]}\nUse 3–5 groups and 8–14 passages in total, from both Testaments, most important first. Only cite passages that really address the topic.`;
+  try {
+    run.data = await sample.json(prompt, { signal: ctl.signal });
+    run.status = "done";
+    topicCache.delete(k); topicCache.set(k, run);
+    const keep = Object.fromEntries([...topicCache.entries()].slice(-12).map(([kk, v]) => [kk, { status: "done", topic: v.topic, data: v.data }]));
+    store.set("topics", keep);
+  } catch (e) {
+    if (e && e.code === "cancelled") { if (S.topicRun === run) S.topic = null; }
+    else { run.status = "error"; run.error = errCopy(e); }
+  }
+  if (S.tab === "topics" && S.topicRun === run) renderTopics();
+}
+
+/* ---------- Today's reflection ---------- */
+function reflectTarget() {
+  const st = planStatus();
+  if (st && !st.finished) {
+    let idx = st.next;
+    if (st.readToday) {
+      const t = todayYmd();
+      const ds = Object.keys(st.done).filter(k => st.done[k] === t).map(Number);
+      if (ds.length) idx = Math.max(...ds);
+    }
+    return { label: readingLabel(planDay(st.p.planId, idx)), from: `Day ${idx + 1} of ${st.def.name}` };
+  }
+  return { label: refLabel(S.ref), from: "The passage you have open. Start a reading plan to get a reflection on each day's reading." };
+}
+const reflectKey = () => todayYmd() + "|" + S.trans + "|" + reflectTarget().label;
+function renderReflect() {
+  const pane = $("pane");
+  const tgt = reflectTarget();
+  const key = reflectKey();
+  const saved = store.get("reflect");
+  let r = S.reflect && S.reflect.key === key ? S.reflect : (saved && saved.key === key ? { key, status: "done", text: saved.text } : null);
+  if (!r && sample) { runReflect(false); return; }
+  let body;
+  if (!r) body = sampleState === "off" ? NO_CLAUDE : `<p class="empty">Preparing…</p>`;
+  else if (r.status === "thinking") body = `<div class="thinking">Writing today's reflection… <button class="btn small" data-stop>Stop</button></div>`;
+  else if (r.status === "error") body = `<p class="err">${esc(r.error)}</p><button class="btn small" id="reflectBtn">Try again</button>`;
+  else body = `<div class="prose" id="streamBody">${md(r.text)}</div>` + (r.status === "done" && sample ? `<button class="btn small" id="reflectBtn">Write a different one</button>` : "");
+  pane.innerHTML = `<h3 style="margin:0;font-family:var(--f-scripture);font-size:1.2rem">${esc(tgt.label)}</h3>
+    <p class="muted" style="margin:2px 0 14px;font-size:.85rem">${esc(fmtDate(todayYmd()))} · ${esc(tgt.from)}</p>` + body;
+}
+async function runReflect(force) {
+  if (!sample) { renderReflect(); return; }
+  const key = reflectKey();
+  const tgt = reflectTarget();
+  if (!force && S.reflect && S.reflect.key === key && S.reflect.status !== "error") return;
+  ctl && ctl.abort(); ctl = new AbortController();
+  const r = S.reflect = { key, status: "thinking", text: "" };
+  if (S.tab === "reflect") renderReflect();
+  const prompt = `${STUDY_RULES}\n\nToday's Bible reading is ${tgt.label}. Write a short daily devotional reflection on it for an ordinary reader, about 200 words. Use these ### headings in order: "### A thought for today" (two short paragraphs drawing out one main idea from the reading and connecting it to everyday life), "### Carry this verse" (quote one key verse exactly from the ${TRANS[S.trans]}, then its reference), "### A question to sit with" (one question), "### A short prayer" (two or three sentences).${force ? " Take a different angle from the most obvious one." : ""}`;
+  try {
+    const out = await sample(prompt, { cache: !force, signal: ctl.signal, onText: ({ text }) => {
+      r.text = text;
+      if (S.tab !== "reflect" || S.reflect !== r) return;
+      if (r.status !== "streaming") { r.status = "streaming"; renderReflect(); }
+      else { const b = $("streamBody"); if (b) b.innerHTML = md(text); }
+    } });
+    r.text = out.text; r.status = "done";
+    store.set("reflect", { key, text: r.text });
+  } catch (e) {
+    if (e && e.code === "cancelled") { r.status = "error"; r.error = "Stopped."; }
+    else { r.status = "error"; r.error = errCopy(e); }
+  }
+  if (S.tab === "reflect" && S.reflect === r) renderReflect();
+}
+
+/* ---------- Read aloud ---------- */
+const synth = window.speechSynthesis || null;
+const TTS = { on: false, paused: false, idx: 0, rate: Number(store.get("rate")) || 1, gen: 0 };
+if (synth && window.SpeechSynthesisUtterance) $("listenBtn").hidden = false;
+function pickVoice() {
+  const vs = synth.getVoices();
+  return vs.find(v => /^en[-_]/i.test(v.lang) && v.localService) || vs.find(v => /^en/i.test(v.lang)) || null;
+}
+function speakFrom(i) {
+  if (!synth) return;
+  if (!S.verses.length || i >= S.verses.length) { stopTTS(); return; }
+  TTS.on = true; TTS.paused = false; TTS.idx = i;
+  const gen = ++TTS.gen;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(S.verses[i].text);
+  u.rate = TTS.rate;
+  const v = pickVoice(); if (v) { u.voice = v; u.lang = v.lang; }
+  u.onend = () => { if (TTS.on && !TTS.paused && gen === TTS.gen) speakFrom(i + 1); };
+  u.onerror = (e) => {
+    if (gen !== TTS.gen || e.error === "interrupted" || e.error === "canceled") return;
+    stopTTS();
+    const bar = $("listenbar"); bar.hidden = false; bar.textContent = "Your device couldn't read this aloud. Check that your volume is on and try again.";
+  };
+  synth.speak(u);
+  markReading(true); renderListen();
+}
+function pauseTTS() { TTS.paused = true; TTS.gen++; synth.cancel(); markReading(); renderListen(); }
+function stopTTS() {
+  if (!synth) return;
+  const was = TTS.on;
+  TTS.on = false; TTS.paused = false; TTS.gen++;
+  if (was) synth.cancel();
+  markReading(); renderListen();
+}
+function markReading(scroll) {
+  document.querySelectorAll(".v.reading").forEach(el => el.classList.remove("reading"));
+  if (!TTS.on || !S.verses[TTS.idx]) return;
+  const el = document.querySelector(`.v[data-n="${S.verses[TTS.idx].n}"]`);
+  if (el) { el.classList.add("reading"); if (scroll) el.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+}
+function renderListen() {
+  const bar = $("listenbar");
+  $("listenBtn").textContent = TTS.on ? "Stop listening" : "Listen";
+  if (!TTS.on) { bar.hidden = true; return; }
+  bar.hidden = false;
+  bar.innerHTML = `<span class="grow">${TTS.paused ? "Paused at" : "Reading"} verse ${S.verses[TTS.idx] ? S.verses[TTS.idx].n : ""}</span>
+    <button class="btn small" data-tts="${TTS.paused ? "resume" : "pause"}">${TTS.paused ? "Resume" : "Pause"}</button>
+    <button class="btn small" data-tts="stop">Stop</button>
+    <span class="seg" role="group" aria-label="Speed">${[0.8, 1, 1.25].map(r => `<button data-rate="${r}" aria-pressed="${TTS.rate === r}">${r}×</button>`).join("")}</span>`;
+}
+$("listenBtn").addEventListener("click", () => {
+  if (TTS.on) { stopTTS(); return; }
+  const first = S.sel.size ? Math.min(...S.sel) : null;
+  const i = first ? Math.max(0, S.verses.findIndex(v => v.n === first)) : 0;
+  speakFrom(i);
+});
+$("listenbar").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-tts]");
+  if (b) { const a = b.dataset.tts; if (a === "pause") pauseTTS(); else if (a === "resume") speakFrom(TTS.idx); else stopTTS(); return; }
+  const r = e.target.closest("[data-rate]");
+  if (r) { TTS.rate = Number(r.dataset.rate); store.set("rate", TTS.rate); if (TTS.on && !TTS.paused) speakFrom(TTS.idx); else renderListen(); }
+});
+
+/* ---------- Compare translations ---------- */
+const CMP = new Map();
+const chapterLabel = () => refLabel({ ...S.ref, from: null });
+function cmpNums() {
+  if (S.sel.size) return [...S.sel].sort((a, b) => a - b);
+  if (S.verses.length && S.verses.length <= 12) return S.verses.map(v => v.n);
+  return null;
+}
+const cmpKeyFor = (nums) => chapterLabel() + "|" + nums.join(",");
+const numsOf = (key) => key.split("|")[1].split(",").map(Number);
+function renderCompareTools() {
+  const tools = $("paneTools");
+  const nums = cmpNums();
+  const k = nums && cmpKeyFor(nums);
+  tools.hidden = false;
+  tools.innerHTML = `<span class="grow">${S.cmpKey ? "Comparing v. " + versesLabel(numsOf(S.cmpKey)) : "Nothing compared yet"}</span>` +
+    (k && k !== S.cmpKey && sample ? `<button class="btn small primary" id="cmpBtn">Compare v. ${versesLabel(nums)}</button>` : "");
+}
+function renderCompare() {
+  const pane = $("pane");
+  if (!S.verses.length) { pane.innerHTML = `<p class="empty">Open a passage first.</p>`; return; }
+  if (!S.cmpKey || !S.cmpKey.startsWith(chapterLabel() + "|")) {
+    S.cmpKey = null;
+    const nums = cmpNums();
+    if (nums && sample) { S.cmpKey = cmpKeyFor(nums); runCompare(S.cmpKey); return; }
+  }
+  renderCompareTools();
+  if (!S.cmpKey) {
+    pane.innerHTML = sampleState === "off" ? NO_CLAUDE : `<p class="empty">Tap one or more verses in the reading to compare them side by side in ${Object.keys(TRANS).join(", ")}.</p>`;
+    return;
+  }
+  const r = CMP.get(S.cmpKey);
+  if (!r || r.status === "thinking") { pane.innerHTML = `<div class="thinking">Gathering the translations… <button class="btn small" data-stop>Stop</button></div>`; return; }
+  if (r.status === "error") { pane.innerHTML = `<p class="err">${esc(r.error)}</p><button class="btn small" id="cmpRetry">Try again</button>`; return; }
+  const order = [S.trans, ...Object.keys(TRANS).filter(t => t !== S.trans)];
+  pane.innerHTML = (r.differences ? `<div class="diff"><h3 class="sec-h">What's different</h3><div class="prose"><p>${esc(r.differences)}</p></div></div>` : "") +
+    `<div class="cmp">` + numsOf(S.cmpKey).map(n => `<div class="cmp-verse"><h4>${esc(chapterLabel())}:${n}</h4>` +
+      order.map(t => `<div class="cmp-row${t === S.trans ? " mine" : ""}"><span class="tag" title="${esc(TRANS[t])}">${t}</span><span class="txt">${esc((r.texts[t] || {})[n] || "Not available")}</span></div>`).join("") +
+    `</div>`).join("") + `</div>
+    <p class="hint">KJV · King James Version (1611/1769). WEB · World English Bible (modern). ASV · American Standard Version (1901). YLT · Young's Literal Translation (1862), very word-for-word.</p>`;
+}
+function startCompare() { const nums = cmpNums(); if (!nums) return; S.cmpKey = cmpKeyFor(nums); runCompare(S.cmpKey); }
+async function runCompare(key, force) {
+  if (!key) return;
+  const have = CMP.get(key);
+  if (have && !force && have.status !== "error") { if (S.tab === "compare") renderCompare(); return; }
+  if (!sample) return;
+  const nums = numsOf(key);
+  const label = refLabel(S.ref);
+  const texts = {};
+  for (const t of Object.keys(TRANS)) {
+    const vs = t === S.trans ? S.verses : (store.get("p:" + t + "|" + label) || (t === "KJV" && label === "Psalm 23" ? PS23 : null));
+    if (!vs) continue;
+    const o = {};
+    nums.forEach(n => { const v = vs.find(x => x.n === n); if (v) o[n] = v.text; });
+    if (Object.keys(o).length === nums.length) texts[t] = o;
+  }
+  const missing = Object.keys(TRANS).filter(t => !texts[t]);
+  const r = { status: "thinking", texts };
+  CMP.set(key, r);
+  if (S.tab === "compare") renderCompare();
+  ctl && ctl.abort(); ctl = new AbortController();
+  const known = Object.entries(texts).map(([t, o]) => `${t}:\n` + nums.map(n => n + " " + o[n]).join("\n")).join("\n\n");
+  const step = missing.length ? 2 : 1;
+  const prompt = `Passage: ${S.ref.book} chapter ${S.ref.ch}, verse${nums.length > 1 ? "s" : ""} ${versesLabel(nums)}.\n\n` +
+    (known ? `Text already on hand:\n${known}\n\n` : "") +
+    (missing.length ? `1. Give the exact text of these verses in each of these public-domain translations: ${missing.map(t => TRANS[t] + " (" + t + ")").join(", ")}. Reproduce the wording verbatim as published, without italics markup or footnotes.\n` : "") +
+    `${step}. In 1–3 plain sentences for an ordinary reader, point out the most meaningful wording differences between the KJV, WEB, ASV and YLT here and why they matter, for example how a Hebrew or Greek word was rendered. If there are none worth noting, say so briefly.\n` +
+    `Return JSON only: {"texts":{${missing.map(t => `"${t}":{"${nums[0]}":"verse text"}`).join(",")}},"differences":"..."}`;
+  try {
+    const out = await sample.json(prompt, { signal: ctl.signal });
+    for (const t of missing) {
+      const o = (out && out.texts && out.texts[t]) || {};
+      r.texts[t] = {};
+      nums.forEach(n => { if (o[n]) r.texts[t][n] = String(o[n]); });
+    }
+    r.differences = (out && out.differences) || "";
+    r.status = "done";
+  } catch (e) {
+    r.status = "error"; r.error = e && e.code === "cancelled" ? "Stopped." : errCopy(e);
+  }
+  if (S.tab === "compare" && S.cmpKey === key) renderCompare();
+}
+
+/* ---------- People and places lookup ---------- */
+const LOOK = new Map();
+function renderLookup() {
+  const box = $("lookupBox"); if (!box) return;
+  if (!S.lookup) { box.innerHTML = ""; return; }
+  const r = LOOK.get(S.lookup.toLowerCase());
+  if (!r || r.status === "thinking") { box.innerHTML = `<div class="thinking">Looking up ${esc(S.lookup)}…</div>`; return; }
+  if (r.status === "error") { box.innerHTML = `<p class="err">${esc(r.error)}</p>`; return; }
+  const d = r.data || {};
+  const refs = (d.refs || []).map(x => `<button class="link" data-goto="${esc(x)}">${esc(x)}</button>`).join("");
+  box.innerHTML = `<div class="pp-item"><span class="nm">${esc(d.name || S.lookup)}</span><span class="who">${esc(d.who || "")}</span>${d.story ? `<div>${esc(d.story)}</div>` : ""}${d.today ? `<div><strong>Today:</strong> ${esc(d.today)}</div>` : ""}${refs ? `<div class="refs">${refs}</div>` : ""}</div>`;
+}
+async function runLookup(q) {
+  q = (q || "").trim(); if (!q || !sample) return;
+  S.lookup = q;
+  const k = q.toLowerCase();
+  const have = LOOK.get(k);
+  if (have && have.status !== "error") { renderLookup(); return; }
+  const r = { status: "thinking" };
+  LOOK.set(k, r); renderLookup();
+  try {
+    r.data = await sample.json(`${STUDY_RULES}\n\nA reader wants to know about "${q}" in the Bible. Say who or what it is. If several people or places share the name, cover the best known and mention the others briefly. Return JSON only: {"name":"...","who":"one line","story":"3–5 plain sentences on their story or significance across the Bible","today":"for a place, where it is today; otherwise empty","refs":["3–5 key references with full English book names"]}. If it isn't in the Bible, say so in "who" and leave the rest empty.`);
+    r.status = "done";
+  } catch (e) { r.status = "error"; r.error = errCopy(e); }
+  if (S.lookup === q) renderLookup();
+}
+
+/* ---------- pane events ---------- */
+$("pane").addEventListener("click", async (e) => {
+  const t = e.target;
+  if (t.closest("[data-stop]")) { ctl && ctl.abort(); return; }
+  if (t.id === "retryBtn") { run(S.tab, true); return; }
+  const g = t.closest("[data-goto]"); if (g) { gotoRef(g.dataset.goto); return; }
+  const a = t.closest("[data-answer]"); if (a) { S.pendingNote = "Q: " + a.dataset.answer + "\n\n"; setTab("notes"); return; }
+  const c = t.closest("[data-chip]"); if (c) { $("askInput").value = c.dataset.chip; sendAsk(); return; }
+  // plan
+  const sp = t.closest("[data-startplan]"); if (sp) { startPlan(sp.dataset.startplan); return; }
+  const pd = t.closest("[data-pickday]"); if (pd) { S.pickedDay = Number(pd.dataset.pickday); renderPlan(); return; }
+  const md_ = t.closest("[data-markday]"); if (md_) { setDay(Number(md_.dataset.markday), true); return; }
+  const um = t.closest("[data-unmark]"); if (um) { setDay(Number(um.dataset.unmark), false); return; }
+  if (t.closest("[data-endplan]")) { $("endPlan").innerHTML = `This clears your progress. <button class="btn small" data-endyes>Stop plan</button> <button class="btn small" data-endno>Keep going</button>`; return; }
+  if (t.closest("[data-endyes]")) { S.pickedDay = null; PLAN.remove("current").catch(() => {}); return; }
+  if (t.closest("[data-endno]")) { renderPlan(); return; }
+  // highlights
+  const hf = t.closest("[data-hlf]"); if (hf) { S.hlFilter = hf.dataset.hlf; renderHighlights(); return; }
+  const uh = t.closest("[data-unhl]"); if (uh) { HL.remove(uh.dataset.unhl).catch(() => {}); return; }
+  // notes
+  const nf = t.closest("[data-nf]"); if (nf) { S.notesFilter = nf.dataset.nf; renderNotes(); return; }
+  // shared delete with inline confirm
+  const d = t.closest("[data-del]");
+  if (d) { d.parentElement.innerHTML = `Delete? <button class="btn small" data-delyes="${esc(d.dataset.del)}">Yes</button> <button class="btn small" data-delno>Cancel</button>`; return; }
+  const y = t.closest("[data-delyes]");
+  if (y) { const [coll, id] = y.dataset.delyes.split(":"); (coll === "notes" ? NOTES : PR).remove(id).catch(() => {}); return; }
+  if (t.closest("[data-delno]")) { renderNotesList(); renderPrayerList(); return; }
+  // prayer
+  if (t.id === "prayBtn") { runPrayer(); return; }
+  if (t.id === "savePrayer") {
+    const r = results.get(prayerKey()); if (!r || r.saved) return;
+    r.saved = true; t.disabled = true; t.textContent = "Saved to journal";
+    PR.put(uid("p"), { text: r.text, ref: r.ref, guided: true, answered: false, createdAt: Date.now() }).catch(() => { r.saved = false; t.disabled = false; t.textContent = "Couldn't save. Try again"; });
+    return;
+  }
+  const prf = t.closest("[data-prf]"); if (prf) { S.prFilter = prf.dataset.prf; S.answering = null; renderPrayer(); return; }
+  const ans = t.closest("[data-answering]"); if (ans) { S.answering = ans.dataset.answering; renderPrayerList(); return; }
+  if (t.closest("[data-answercancel]")) { S.answering = null; renderPrayerList(); return; }
+  // topics
+  const tp = t.closest("[data-topic]"); if (tp) { searchTopic(tp.dataset.topic); return; }
+  if (t.closest("[data-topicclear]")) { S.topic = null; renderTopics(); $("topicInput").focus(); return; }
+  // reflection, compare, lookup
+  if (t.id === "reflectBtn") { runReflect(true); return; }
+  if (t.id === "cmpBtn") { startCompare(); return; }
+  if (t.id === "cmpRetry") { runCompare(S.cmpKey, true); return; }
+  const lk = t.closest("[data-lookup]"); if (lk) { runLookup(lk.dataset.lookup); return; }
+});
+$("pane").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  if (f.id === "noteForm") {
+    const text = $("noteText").value.trim(); if (!text) return;
+    const ref = refLabel({ ...S.ref, from: null }) + (S.sel.size ? ":" + versesLabel(S.sel) : "");
+    try { await NOTES.put(uid("n"), { ref, trans: S.trans, text, createdAt: Date.now() }); $("noteText").value = ""; }
+    catch { $("noteWhere").textContent = "Couldn't save that note. Try again."; }
+  } else if (f.id === "prayerForm") {
+    const text = $("prayerText").value.trim(); if (!text) return;
+    const ref = $("prayerLink").checked ? refLabel({ ...S.ref, from: null }) + (S.sel.size ? ":" + versesLabel(S.sel) : "") : "";
+    if (S.prFilter === "answered") S.prFilter = "open";
+    try { await PR.put(uid("p"), { text, ref, answered: false, createdAt: Date.now() }); $("prayerText").value = ""; renderPrayerList(); }
+    catch { $("prayerWhere").textContent = "Couldn't save that prayer. Try again."; }
+  } else if (f.dataset.answerform) {
+    const p = PR.get(f.dataset.answerform); if (!p) return;
+    const note = ($("answerText").value || "").trim();
+    S.answering = null;
+    try { await PR.put(p.id, { ...p, answered: true, answeredAt: Date.now(), answerNote: note }); } catch {}
+    renderPrayerList();
+  } else if (f.id === "lookupForm") {
+    runLookup($("lookupInput").value);
+  } else if (f.id === "topicForm") {
+    searchTopic($("topicInput").value);
+  }
+});
+
+/* ---------- top bar ---------- */
+$("bookList").innerHTML = BOOKS.map(([b]) => `<option value="${b} "></option>`).join("");
+$("transSel").innerHTML = Object.entries(TRANS).map(([k, v]) => `<option value="${k}">${k} · ${v}</option>`).join("");
+$("gotoForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const ref = parseRef($("refInput").value);
+  if (!ref) { $("refInput").setCustomValidity("Try a reference like John 3 or Romans 8:28-39"); $("refInput").reportValidity(); return; }
+  $("refInput").setCustomValidity(""); $("refInput").value = "";
+  openPassage(ref);
+});
+$("refInput").addEventListener("input", () => $("refInput").setCustomValidity(""));
+$("transSel").addEventListener("change", () => { S.trans = $("transSel").value; store.set("trans", S.trans); openPassage(S.ref); });
+$("prevBtn").onclick = () => stepChapter(-1);
+$("nextBtn").onclick = () => stepChapter(1);
+
+function renderAll() { renderScripture(); renderToday(); renderTabs(); renderPane(); }
+
+/* ---------- shared with the sermon workshop ---------- */
+window.dailyBread = { current: () => ({ ref: refLabel(S.ref), trans: S.trans, verses: S.verses.map(v => ({ ...v })), loading: S.loadingPassage }) };
+$("swLink").onclick = () => { setTab("sermon"); window.scrollTo({ top: 0, behavior: "smooth" }); };
+
+/* ---------- boot ---------- */
+const savedTab = store.get("tab"); if (savedTab && TABS.some(t => t[0] === savedTab) && savedTab !== "ask") S.tab = savedTab;
+const savedDepth = store.get("depth"); if (savedDepth === "deeper" || savedDepth === "plain") S.depth = savedDepth;
+S.verses = PS23;
+$("transSel").value = S.trans;
+renderAll();
+initStores();
+})();
+</script>
+<script>
+(() => {
+"use strict";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem("sw:" + k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem("sw:" + k, JSON.stringify(v)); } catch {} }
+};
+const uid = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const words = (s) => (String(s || "").trim().match(/\S+/g) || []).length;
+const TRANS = { KJV: "King James Version", WEB: "World English Bible", ASV: "American Standard Version (1901)", YLT: "Young's Literal Translation" };
+const STEPS = [["study", "Text & study"], ["idea", "Big idea"], ["write", "Outline & write"], ["rehearse", "Review"]];
+const fmtMin = (m) => (Math.round(m * 10) / 10).toFixed(1);
+const fmtClock = (s) => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+
+/* ---------- capabilities ---------- */
+const use = (name) => (window.claude && window.claude.use) ? window.claude.use(name).catch(() => null) : Promise.resolve(null);
+let sample = null, sampleState = "pending", downloads = null;
+use("sample").then(s => { sample = s; sampleState = s ? "ready" : "off"; renderCoach(); });
+use("downloads").then(d => { downloads = d; if (S.step === "rehearse") renderSurface(); });
+const ERR = {
+  not_granted: "Asking Claude isn't allowed for this page. You can allow it from the page's permissions menu.",
+  rate_limited: "Too many requests at once. Wait a moment, then try again.",
+  prompt_too_large: "That's too much text to send at once. Try a shorter passage.",
+  session_expired: "Your session has expired. Reload the page and sign in again.",
+  sampling_disabled: "Asking Claude is turned off for your account.",
+  refused: "The coach declined that request. Try rewording it.",
+  invalid_json: "The answer came back in a broken format. Try again.",
+  empty_completion: "The coach returned an empty answer. Try again.",
+};
+const errCopy = (e) => ERR[e && e.code] || "Something went wrong reaching Claude. Try again.";
+
+/* ---------- store: one document per sermon ---------- */
+const DB = { mode: "pending", ref: null, q: Promise.resolve() };
+let sermons = [];
+async function initStore() {
+  const [db, user] = await Promise.all([use("db"), use("user")]);
+  const id = user ? await user.id().catch(() => null) : null;
+  if (db && id) {
+    DB.mode = "db"; DB.ref = db.collection("data/users/" + id);
+    DB.ref.onSnapshot((snap) => {
+      const remote = snap.docs.map(d => ({ ...d.data(), id: d.id })).filter(d => /^s/.test(d.id));
+      mergeRemote(remote);
+    }, () => useLocal());
+  } else useLocal();
+}
+function useLocal() { DB.mode = "local"; DB.ref = null; mergeRemote(store.get("sermons") || []); }
+function mergeRemote(remote) {
+  const cur = current();
+  sermons = remote.map(r => (cur && r.id === cur.id && (dirty || (cur.updatedAt || 0) >= (r.updatedAt || 0))) ? cur : r);
+  if (cur && !sermons.find(s => s.id === cur.id) && dirty) sermons.push(cur);
+  sermons.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  const replaced = cur && sermons.find(s => s.id === cur.id) !== cur;
+  if (!S.currentId || !sermons.find(s => s.id === S.currentId)) S.currentId = (store.get("current") && sermons.find(s => s.id === store.get("current"))) ? store.get("current") : (sermons[0] && sermons[0].id) || null;
+  renderPicker();
+  if (replaced || !booted) { booted = true; renderAll(); } else { renderSteps(); renderClock(); }
+}
+let booted = false, dirty = false, saveTimer = null;
+function persist(s) {
+  if (DB.mode === "db") {
+    const { id, ...body } = s;
+    const snapshot = JSON.parse(JSON.stringify(body));
+    return (DB.q = DB.q.catch(() => {}).then(() => DB.ref.doc(id).set(snapshot)));
+  }
+  const all = (store.get("sermons") || []).filter(x => x.id !== s.id); all.unshift(s); store.set("sermons", all);
+  return Promise.resolve();
+}
+function removeSermon(id) {
+  if (DB.mode === "db") return (DB.q = DB.q.catch(() => {}).then(() => DB.ref.doc(id).delete()));
+  store.set("sermons", (store.get("sermons") || []).filter(x => x.id !== id)); mergeRemote(store.get("sermons"));
+  return Promise.resolve();
+}
+function scheduleSave() {
+  const s = current(); if (!s) return;
+  s.updatedAt = Date.now(); dirty = true;
+  setSaved("Saving…");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    persist(s).then(() => { dirty = false; setSaved(DB.mode === "db" ? "Saved to your account" : "Saved in this browser"); })
+      .catch(() => setSaved("Couldn't save. Your work is still here; keep typing to try again."));
+  }, 1200);
+}
+function setSaved(t) { const el = $("savedNote"); if (el) el.textContent = t; }
+
+/* ---------- state ---------- */
+const S = { currentId: null, step: store.get("step") || "study", coach: null, timer: null };
+const current = () => sermons.find(s => s.id === S.currentId) || null;
+function newSermon() {
+  const s = {
+    id: uid("s"), title: "", ref: "", trans: "KJV", passage: [], date: "", audience: "",
+    observations: "", research: {}, subject: "", complement: "", bigIdea: "",
+    target: 30, wpm: 130,
+    sections: [
+      { key: "intro", kind: "intro", body: "" },
+      { key: uid("p"), kind: "point", heading: "", verses: "", body: "" },
+      { key: uid("p"), kind: "point", heading: "", verses: "", body: "" },
+      { key: uid("p"), kind: "point", heading: "", verses: "", body: "" },
+      { key: "concl", kind: "conclusion", body: "" }
+    ],
+    coach: {}, practice: null, createdAt: Date.now(), updatedAt: Date.now()
+  };
+  sermons.unshift(s); S.currentId = s.id; store.set("current", s.id); S.step = "study"; S.coach = null;
+  persist(s).catch(() => {});
+  renderPicker(); renderAll();
+}
+
+/* ---------- timing ---------- */
+function sectionLabel(s, sec) {
+  if (sec.kind === "intro") return "Introduction";
+  if (sec.kind === "conclusion") return "Conclusion";
+  return "Point " + (s.sections.filter(x => x.kind === "point").indexOf(sec) + 1);
+}
+function budgets(s) {
+  const T = Number(s.target) || 30;
+  const pts = s.sections.filter(x => x.kind === "point").length || 1;
+  const intro = T * 0.13, concl = T * 0.12, each = (T - intro - concl) / pts;
+  return Object.fromEntries(s.sections.map(x => [x.key, x.kind === "intro" ? intro : x.kind === "conclusion" ? concl : each]));
+}
+function secWords(sec) { return words(sec.heading) + words(sec.body); }
+function estMin(s, sec) { return secWords(sec) / (Number(s.wpm) || 130); }
+function lenClass(est, budget) {
+  if (!est) return "";
+  const r = est / budget;
+  return r < 0.8 ? "warn" : r > 1.15 ? "long" : "ok";
+}
+function totalEst(s) { return s.sections.reduce((a, x) => a + estMin(s, x), 0); }
+
+/* ---------- rendering ---------- */
+function renderPicker() {
+  const sel = $("sermonSel");
+  sel.innerHTML = sermons.length ? sermons.map(s => `<option value="${esc(s.id)}"${s.id === S.currentId ? " selected" : ""}>${esc(s.title || s.ref || "Untitled sermon")}${s.date ? " · " + esc(new Date(s.date + "T00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" })) : ""}</option>`).join("") : `<option>No sermons yet</option>`;
+  sel.disabled = !sermons.length;
+  $("delWrap").hidden = !sermons.length;
+  $("welcomeWhere").textContent = DB.mode === "db" ? "Saves privately to your account." : DB.mode === "local" ? "Saves in this browser." : "";
+}
+function renderAll() {
+  const s = current();
+  $("welcome").hidden = !!s;
+  $("steps").hidden = $("bench").hidden = !s;
+  if (!s) return;
+  renderSteps(); renderSurface(); renderCoach();
+}
+function stepStatus(s, id) {
+  if (id === "study") return s.passage.length ? (s.ref + (words(s.observations) ? " · notes" : "")) : "Choose a passage";
+  if (id === "idea") return s.bigIdea.trim() ? "Written" : "One sentence";
+  if (id === "write") { const w = s.sections.reduce((a, x) => a + secWords(x), 0); return w ? "In progress" : "Not started"; }
+  return "Read it through";
+}
+function renderSteps() {
+  const s = current(); if (!s) return;
+  $("steps").innerHTML = STEPS.map(([id, t], i) => {
+    const st = stepStatus(s, id);
+    const done = (id === "study" && s.passage.length) || (id === "idea" && s.bigIdea.trim()) || (id === "write" && s.sections.every(x => x.body.trim()));
+    return `<button class="step${done ? " done" : ""}" data-step="${id}" ${S.step === id ? 'aria-current="step"' : ""}><span class="n">STEP ${i + 1}</span><span class="t">${t}</span><span class="s">${esc(st)}</span></button>`;
+  }).join("");
+}
+$("steps").addEventListener("click", (e) => { const b = e.target.closest("[data-step]"); if (b) goStep(b.dataset.step); });
+function goStep(id) { S.step = id; store.set("step", id); renderSteps(); renderSurface(); if (window.innerWidth <= 900) $("steps").scrollIntoView({ behavior: "smooth", block: "start" }); }
+
+const field = (id, label, value, opts = {}) => {
+  const help = opts.help ? `<span class="help">${opts.help}</span>` : "";
+  const control = opts.area
+    ? `<textarea id="${id}" data-f="${opts.f || id}" class="${opts.tall ? "tall" : ""}" placeholder="${esc(opts.ph || "")}" rows="${opts.rows || 5}">${esc(value)}</textarea>`
+    : `<input type="${opts.type || "text"}" id="${id}" data-f="${opts.f || id}" value="${esc(value)}" placeholder="${esc(opts.ph || "")}">`;
+  return `<div class="field"><label for="${id}">${label}</label>${help}${control}</div>`;
+};
+
+function renderSurface() {
+  const s = current(); if (!s) return;
+  const el = $("surface");
+  const saved = `<div class="row"><span class="muted grow" id="savedNote" style="font-size:.82rem">${dirty ? "Saving…" : DB.mode === "db" ? "Saved to your account" : "Saved in this browser"}</span></div>`;
+  if (S.step === "study") {
+    el.innerHTML = `
+      <div><h2>Text &amp; study</h2><p class="lede">Start with the passage, not the sermon. Read it several times and write down what you see before you look at any help.</p></div>
+      <div class="grid2">
+        ${field("f-ref", "Passage", s.ref, { f: "ref", ph: "e.g. Luke 15:11-32" })}
+        <div class="field"><label for="f-trans">Translation</label><select id="f-trans" data-f="trans">${Object.entries(TRANS).map(([k, v]) => `<option value="${k}"${s.trans === k ? " selected" : ""}>${k} · ${v}</option>`).join("")}</select></div>
+        ${field("f-date", "Preaching on", s.date, { f: "date", type: "date" })}
+      </div>
+      <div class="row"><button class="btn primary" id="loadPassage">${s.passage.length ? "Reload passage" : "Load passage"}</button><button class="btn" id="useReading">Use the passage I'm reading</button><span class="muted" id="passageNote"></span></div>
+      ${s.passage.length ? `<div class="passage">${s.passage.map(v => `<sup>${v.n}</sup>${esc(v.text)} `).join("")}</div>` : ""}
+      ${field("f-aud", "Who are you preaching to?", s.audience, { f: "audience", area: true, rows: 2, ph: "Your congregation, what they're facing right now, the occasion…", help: "The coach uses this to check that your application fits your people." })}
+      ${field("f-obs", "Your observations", s.observations, { f: "observations", area: true, rows: 8, ph: "Repeated words, commands, contrasts, surprises, questions you have, what the passage meant for its first hearers…", help: "This is your own close reading. Write it before opening the research below." })}
+      <div class="row"><button class="btn" data-coach="obs">Check my observations</button></div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Research help</div>
+        ${[["background", "Background and setting"], ["words", "Key words in Hebrew or Greek"], ["xref", "Cross-references"]].map(([k, l]) => `
+          <details class="research" ${s.research[k] ? "" : ""}>
+            <summary>${l}</summary>
+            <div style="margin-top:8px">${s.research[k] ? `<div class="prose">${md(s.research[k])}</div><button class="btn small" data-research="${k}">Refresh</button>` : `<button class="btn small" data-research="${k}" ${s.passage.length ? "" : "disabled"}>Look this up</button>`}</div>
+          </details>`).join("")}
+      </div>
+      ${saved}`;
+  } else if (S.step === "idea") {
+    el.innerHTML = `
+      <div><h2>Big idea</h2><p class="lede">Every good sermon says one thing. Work out what the passage is about, what it says about it, then put it in one sentence your people can remember.</p></div>
+      ${s.passage.length ? `<details class="research"><summary>${esc(s.ref)} (${esc(s.trans)})</summary><div class="passage" style="margin-top:8px">${s.passage.map(v => `<sup>${v.n}</sup>${esc(v.text)} `).join("")}</div></details>` : `<p class="empty">Tip: load your passage in step 1 so the coach can check your big idea against it.</p>`}
+      <div class="grid2">
+        ${field("f-subj", "What is the passage talking about?", s.subject, { f: "subject", area: true, rows: 3, ph: "The subject, as a question. e.g. Why should …?", help: "The subject." })}
+        ${field("f-comp", "What is it saying about that?", s.complement, { f: "complement", area: true, rows: 3, ph: "The passage's answer to that question.", help: "The complement." })}
+      </div>
+      ${field("f-big", "Your big idea, in one sentence", s.bigIdea, { f: "bigIdea", area: true, rows: 3, ph: "Say it to your people, not about the text.", help: "Aim for something you could say from memory and they could repeat on the way home." })}
+      <div class="row"><button class="btn primary" data-coach="idea">Check my big idea</button><button class="btn" data-coach="idea-stuck">I'm stuck</button></div>
+      ${saved}`;
+  } else if (S.step === "write") {
+    const b = budgets(s);
+    el.innerHTML = `
+      <div><h2>Outline &amp; write</h2><p class="lede">Write it in your own words, full manuscript or notes. Ask the coach to review a part when you have a draft.</p></div>
+      ${s.bigIdea.trim() ? `<div class="field"><span class="lbl">Your big idea</span><div class="manuscript"><p class="big">${esc(s.bigIdea)}</p></div></div>` : ""}
+      ${field("f-title", "Sermon title", s.title, { f: "title", ph: "Write this last if you like" })}
+      ${s.sections.map(sec => sectionCard(s, sec, b[sec.key])).join("")}
+      <div class="row"><button class="btn" id="addPoint" ${s.sections.filter(x => x.kind === "point").length >= 5 ? "disabled" : ""}>Add a point</button><span class="muted" style="font-size:.85rem">Most sermons have two to four points.</span></div>
+      ${saved}`;
+  } else {
+    el.innerHTML = renderRehearse(s) + saved;
+  }
+}
+const JOBS = {
+  intro: "Catch their attention, show why this matters, bring them to the text.",
+  point: "State it, explain it from the text, illustrate it, apply it.",
+  conclusion: "Land the big idea and call for a response.",
+};
+const PH = {
+  intro: "How will you open? What need or question will you raise? How will you lead into the passage?",
+  point: "Explain what the verses say and mean. Show it with an illustration. Say what it looks like on Monday.",
+  conclusion: "Bring it back to the big idea. What do you want them to believe, feel or do?",
+};
+function sectionCard(s, sec, budget) {
+  const label = sectionLabel(s, sec);
+  const pointsCount = s.sections.filter(x => x.kind === "point").length;
+  return `<div class="sec" data-sec="${esc(sec.key)}">
+    <div class="sec-head"><span class="kind">${label}</span><span class="job">${JOBS[sec.kind]}</span>
+</div>
+    ${sec.kind === "point" ? `<div class="grid2">
+      <div class="field"><label for="h-${esc(sec.key)}">Point in one sentence</label><input type="text" id="h-${esc(sec.key)}" data-s="${esc(sec.key)}" data-sf="heading" value="${esc(sec.heading)}" placeholder="What this point says"></div>
+      <div class="field"><label for="v-${esc(sec.key)}">From verses</label><input type="text" id="v-${esc(sec.key)}" data-s="${esc(sec.key)}" data-sf="verses" value="${esc(sec.verses)}" placeholder="e.g. 11–16"></div></div>` : ""}
+    <div class="field"><label for="b-${esc(sec.key)}">${sec.kind === "point" ? "Explain, illustrate, apply" : "What you'll say"}</label>
+      <textarea id="b-${esc(sec.key)}" class="tall" data-s="${esc(sec.key)}" data-sf="body" placeholder="${esc(PH[sec.kind])}">${esc(sec.body)}</textarea></div>
+    <div class="row">
+      <button class="btn small primary" data-coach="sec" data-key="${esc(sec.key)}">Review this part</button>
+      <button class="btn small" data-coach="stuck" data-key="${esc(sec.key)}">I'm stuck</button>
+      ${sec.kind !== "conclusion" ? `<button class="btn small" data-coach="illus" data-key="${esc(sec.key)}">Where to find an illustration</button>` : ""}
+      <span class="grow"></span>
+      ${sec.kind === "point" && pointsCount > 1 ? `<span data-rmwrap="${esc(sec.key)}"><button class="btn small" data-rm="${esc(sec.key)}">Remove point</button></span>` : ""}
+    </div>
+  </div>`;
+}
+
+function renderRehearse(s) {
+  const ms = `<div class="manuscript">
+      <h3 style="margin-top:0">${esc(s.title || "Untitled sermon")}</h3>
+      <p class="muted" style="font-family:var(--f-ui);font-size:.88rem">${esc(s.ref)}${s.trans ? " · " + esc(s.trans) : ""}${s.date ? " · " + esc(new Date(s.date + "T00:00").toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })) : ""}</p>
+      ${s.bigIdea ? `<p class="big">${esc(s.bigIdea)}</p>` : ""}
+      ${s.sections.map(sec => `<h3>${esc(sectionLabel(s, sec))}${sec.heading ? ": " + esc(sec.heading) : ""}${sec.verses ? ` <span class="muted" style="font-family:var(--f-ui);font-size:.85rem">(v. ${esc(sec.verses)})</span>` : ""}</h3><p>${sec.body.trim() ? esc(sec.body) : '<span class="muted">Not written yet.</span>'}</p>`).join("")}
+    </div>`;
+  return `
+    <div><h2>Review</h2><p class="lede">Read your sermon through from start to finish. Ask the coach for a full review when you think it's ready.</p></div>
+    <div class="row"><button class="btn primary" data-coach="review">Review my whole sermon</button>${downloads ? `<button class="btn" id="saveFile">Save as a text file</button>` : ""}<span class="muted" id="fileNote"></span></div>
+    <details class="research" open><summary>Read it through</summary><div style="margin-top:10px">${ms}</div></details>`;
+}
+
+function renderClock() {}
+function refreshCounts() {
+  const s = current(); if (!s) return;
+  renderClock();
+  const b = budgets(s);
+  s.sections.forEach(sec => {
+    const p = document.querySelector(`[data-pill="${CSS.escape(sec.key)}"]`);
+    if (p) { const e = estMin(s, sec); p.className = "pill " + lenClass(e, b[sec.key]); p.textContent = `${fmtMin(e)} of ${fmtMin(b[sec.key])} min`; }
+  });
+  renderSteps();
+}
+
+/* ---------- input binding ---------- */
+function onEdit(e) {
+  const s = current(); if (!s) return;
+  const t = e.target;
+  if (t.dataset.f) {
+    let v = t.value;
+    if (t.dataset.f === "target" || t.dataset.f === "wpm") { v = Math.max(5, Math.min(150, Number(v) || 0)) || (t.dataset.f === "wpm" ? 130 : 30); }
+    s[t.dataset.f] = v;
+    if (t.dataset.f === "target" || t.dataset.f === "wpm") { refreshCounts(); if (S.step === "write" || S.step === "rehearse") renderSurfaceKeepFocus(); }
+    if (t.dataset.f === "title" || t.dataset.f === "ref" || t.dataset.f === "date") renderPicker();
+  } else if (t.dataset.s) {
+    const sec = s.sections.find(x => x.key === t.dataset.s); if (!sec) return;
+    sec[t.dataset.sf] = t.value;
+    refreshCounts();
+  } else return;
+  renderSteps();
+  scheduleSave();
+}
+function renderSurfaceKeepFocus() {
+  const a = document.activeElement; const id = a && a.id;
+  if (id && $("surface").contains(a)) return; // don't rebuild under the cursor
+  renderSurface();
+}
+$("surface").addEventListener("input", onEdit);
+$("surface").addEventListener("change", (e) => { if (e.target.tagName === "SELECT") onEdit(e); });
+
+/* ---------- markdown ---------- */
+function md(src) {
+  const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\*(.+?)\*/g, "<em>$1</em>");
+  const out = []; let list = null; let para = [];
+  const flush = () => { if (para.length) { out.push("<p>" + inline(para.join(" ")) + "</p>"); para = []; } if (list) { out.push("<ul>" + list.map(li => "<li>" + inline(li) + "</li>").join("") + "</ul>"); list = null; } };
+  for (const line of String(src || "").split("\n")) {
+    const t = line.trim();
+    if (!t) { flush(); continue; }
+    const h = t.match(/^#{1,4}\s+(.*)$/);
+    if (h) { flush(); out.push("<h3>" + inline(h[1]) + "</h3>"); continue; }
+    const b = t.match(/^[-*•]\s+(.*)$/) || t.match(/^\d+[.)]\s+(.*)$/);
+    if (b) { if (para.length) { out.push("<p>" + inline(para.join(" ")) + "</p>"); para = []; } (list = list || []).push(b[1]); continue; }
+    if (list) flush();
+    para.push(t);
+  }
+  flush();
+  return out.join("");
+}
+
+/* ---------- passage + research ---------- */
+function parseRefParts(ref) {
+  const m = String(ref).trim().match(/^((?:[1-3]\s*)?[A-Za-z][A-Za-z .]*?)\s*(\d+)(?::(\d+)(?:\s*[-–]\s*(\d+))?)?/);
+  return m ? { book: m[1].trim(), ch: m[2], from: m[3], to: m[4] } : null;
+}
+function useReading() {
+  const s = current(); if (!s) return;
+  const cur = window.dailyBread && window.dailyBread.current();
+  const note = $("passageNote");
+  if (!cur || !cur.verses.length) { note.textContent = "Open a chapter in Daily Bread first."; return; }
+  s.ref = cur.ref; s.trans = cur.trans; s.passage = cur.verses; s.research = {};
+  scheduleSave(); renderAll();
+}
+async function loadPassage() {
+  const s = current(); if (!s) return;
+  const note = $("passageNote");
+  const parts = parseRefParts(s.ref);
+  if (!parts) { note.textContent = "Type a reference like Luke 15:11-32 or Psalm 23."; return; }
+  if (!sample) { note.textContent = sampleState === "pending" ? "Still connecting to Claude. Try again in a moment." : "Loading passages needs permission to ask Claude, which isn't available in this view."; return; }
+  note.textContent = "Loading…";
+  const range = parts.from ? ` verses ${parts.from}${parts.to ? "-" + parts.to : ""}` : " (the whole chapter)";
+  try {
+    const out = await sample.json(`Give the exact text of ${parts.book} chapter ${parts.ch}${range} in the ${TRANS[s.trans]} (${s.trans}), which is in the public domain. Reproduce the wording verbatim as published, without italics markup, headings or footnotes.\nReturn JSON only: {"verses":[{"n":1,"text":"..."}]}\nIf the reference does not exist, return {"error":"short explanation"}.`, { modelTier: "default" });
+    if (!out || out.error || !Array.isArray(out.verses) || !out.verses.length) { note.textContent = (out && out.error) || "Couldn't find that passage. Check the reference."; return; }
+    s.passage = out.verses.map(v => ({ n: Number(v.n), text: String(v.text) })).filter(v => v.n && v.text);
+    s.research = {};
+    scheduleSave(); renderSurface(); renderSteps();
+  } catch (e) { note.textContent = errCopy(e); }
+}
+const STUDY_RULES = `You are a careful Bible scholar helping a pastor study a passage before preaching it. Be accurate and grounded in the text and its historical setting. Where Christian traditions read something differently, say so briefly and fairly. Write plainly. Do not suggest sermon points, outlines, titles or illustrations: this is research only. No preamble.`;
+async function runResearch(kind) {
+  const s = current(); if (!s || !sample || !s.passage.length) return;
+  const head = `${STUDY_RULES}\n\nPassage: ${s.ref} (${s.trans})\n${s.passage.map(v => v.n + " " + v.text).join("\n")}\n\n`;
+  const task = {
+    background: `Task: give the background needed to preach this faithfully. Use ### headings: "### Author and first readers", "### Historical setting", "### Literary context" (what comes before and after, and the genre), "### Hard or debated parts". 2–4 sentences each.`,
+    words: `Task: explain the 5–8 most important words in this passage from the original Hebrew or Greek. For each, a bullet: **English word** · original word · transliteration · Strong's number, then 1–2 sentences on its meaning and use elsewhere.`,
+    xref: `Task: list 6–10 cross-references that help interpret this passage, as bullets: **Reference** · one sentence on how it relates. Include quotations, allusions, parallel accounts and key theme passages from both Testaments.`
+  }[kind];
+  S.coach = { label: { background: "Background and setting", words: "Key words", xref: "Cross-references" }[kind], status: "thinking", text: "", research: kind };
+  renderCoach(); scrollCoach();
+  await stream(head + task, (text) => { s.research[kind] = text; });
+  if (S.coach && S.coach.status === "done") { scheduleSave(); if (S.step === "study") renderSurface(); }
+}
+
+/* ---------- coach ---------- */
+let ctl = null;
+function coachRules(s) {
+  return `You are an experienced, warm preaching coach helping a pastor prepare a sermon. Your whole job is to make the PREACHER do the thinking and the writing.
+Strict rules:
+- Never write any part of the sermon for them. Never give sentences, paragraphs, illustrations, stories, titles, points or a big idea they could copy and preach.
+- Never rewrite or "polish" their words, even if asked.
+- Instead: name what is working, ask pointed questions, and give specific suggestions about what to work on, quoting short phrases of their own words where it helps.
+- Check everything against the passage. If something isn't supported by the text, say so and point to the verses.
+- Keep it under 220 words unless told otherwise. Use only ### headings and short bullet lists.`;
+}
+function context(s) {
+  return `Passage: ${s.ref || "(not chosen yet)"} (${s.trans})
+${s.passage.length ? s.passage.map(v => v.n + " " + v.text).join("\n") : ""}
+Listeners: ${s.audience || "(not described)"}
+Big idea so far: ${s.bigIdea || "(not written yet)"}`;
+}
+function coachPrompt(kind, key) {
+  const s = current();
+  const head = coachRules(s) + "\n\n" + context(s) + "\n\n";
+  if (kind === "obs") return head + `The preacher's own observations on the passage:\n<<<\n${s.observations || "(empty)"}\n>>>\nRespond with "### Good eye" (1–2 bullets on what they noticed well) and "### Look again" (3–4 bullets pointing to specific verses or words they haven't dealt with, phrased as questions, without giving the interpretation). If the observations are empty, ask 4 questions that will get them reading closely.`;
+  if (kind === "idea") return head + `Their subject: ${s.subject || "(empty)"}\nTheir complement: ${s.complement || "(empty)"}\nTheir one-sentence big idea: ${s.bigIdea || "(empty)"}\nJudge the big idea on: faithful to the passage, one clear sentence, memorable, speaks to these listeners. Start with "### How it measures up" as four bullets: Faithful, Clear, Memorable, Relevant, each marked Strong, Getting there, or Needs work, with a short reason. Then "### Questions to test it" (2–3) and "### Next step" (one sentence on what to work on, not wording).`;
+  if (kind === "idea-stuck") return head + `They are stuck finding the big idea. Do not give them one. Ask 5 questions, in order, that walk them from the text to the big idea (for example: what is the author's main concern, what is repeated, what did the first hearers need to hear). Then "### Try this": one 10-minute exercise.`;
+  if (kind === "review") {
+    return head + `Here is their whole draft:\nTitle: ${s.title || "(none)"}\n` +
+      s.sections.map(sec => `--- ${sectionLabel(s, sec)}${sec.heading ? ": " + sec.heading : ""}${sec.verses ? " (v. " + sec.verses + ")" : ""}\n${sec.body || "(not written)"}`).join("\n") +
+      `\nYou may use up to 380 words. Use these headings: "### Overall", "### Does it stay with the big idea?", "### Does it flow?", "### Three things to work on next" (numbered, specific, but no wording).`;
+  }
+  const sec = s.sections.find(x => x.key === key);
+  const label = sectionLabel(s, sec);
+  const info = `Part: ${label}${sec.heading ? " — their point: " + sec.heading : ""}${sec.verses ? " (verses " + sec.verses + ")" : ""}\nIts job: ${JOBS[sec.kind]}\nTheir draft:\n<<<\n${sec.body || "(empty)"}\n>>>`;
+  if (kind === "sec") return head + info + `\nRespond with "### What's working" (1–3 bullets), "### Questions to sharpen it" (2–4 bullets), and "### Next step" (one sentence on what to do next). If the draft is empty, say so and ask 3 questions to get them started instead.`;
+  if (kind === "stuck") return head + info + `\nThey are stuck on this part. Do not write it. "### Questions to get you moving": 4–5 questions drawn from the passage and their big idea that help them find their own content. "### Try this": one short exercise they can do in 10 minutes.`;
+  if (kind === "illus") return head + info + `\nThey need an illustration for this part. Do not tell or write any story or example. "### Where to look": 4–5 prompts pointing them to their OWN experience, ministry, reading or Scripture, each starting with words like "Think of a time…" or "Look for…". "### Make it serve the point": one sentence of advice.`;
+}
+const COACH_LABEL = { obs: "Your observations", idea: "Your big idea", "idea-stuck": "Finding the big idea", review: "Whole sermon review", sec: "Review", stuck: "Getting unstuck", illus: "Finding an illustration" };
+async function runCoach(kind, key) {
+  const s = current(); if (!s) return;
+  if (!sample) { S.coach = { label: COACH_LABEL[kind], status: "error", error: sampleState === "pending" ? "Still connecting to Claude. Try again in a moment." : "The coach needs permission to ask Claude, which isn't available in this view." }; renderCoach(); return; }
+  const sec = key && s.sections.find(x => x.key === key);
+  const label = sec ? `${COACH_LABEL[kind]} · ${sectionLabel(s, sec)}` : COACH_LABEL[kind];
+  const ckey = kind + (key ? ":" + key : "");
+  S.coach = { label, status: "thinking", text: "", ckey };
+  renderCoach(); scrollCoach();
+  await stream(coachPrompt(kind, key));
+  if (S.coach && S.coach.ckey === ckey && S.coach.status === "done") { s.coach[ckey] = { label, text: S.coach.text, at: Date.now() }; scheduleSave(); }
+}
+async function stream(prompt, onDone) {
+  ctl && ctl.abort(); ctl = new AbortController();
+  const r = S.coach;
+  try {
+    const out = await sample(prompt, { cache: false, signal: ctl.signal, onText: ({ text }) => {
+      if (S.coach !== r) return;
+      r.text = text;
+      if (r.status !== "streaming") { r.status = "streaming"; renderCoach(); }
+      else { const b = $("coachBody"); if (b) b.innerHTML = md(text); }
+    } });
+    r.text = out.text; r.status = "done";
+    if (onDone) onDone(out.text);
+  } catch (e) {
+    r.status = "error"; r.error = e && e.code === "cancelled" ? "Stopped." : errCopy(e);
+  }
+  if (S.coach === r) renderCoach();
+}
+function renderCoach() {
+  const el = $("coachCard"); if (!el) return;
+  const s = current();
+  const rule = `<div class="rule-note">The coach gives feedback and asks questions. It won't write your sermon for you.</div>`;
+  const c = S.coach;
+  if (!c) {
+    const past = s ? Object.values(s.coach || {}).sort((a, b) => b.at - a.at)[0] : null;
+    el.innerHTML = `<h3>Coach</h3>` + (past ? `<div class="coach-label">${esc(past.label)} <span class="muted" style="font-weight:400;font-size:.8rem">· earlier</span></div><div class="prose">${md(past.text)}</div>` :
+      `<p class="empty" style="margin:0">${sampleState === "off" ? "The coach needs permission to ask Claude, which isn't available in this view." : "When you have something written, ask the coach to check it. Use \"I'm stuck\" for questions that get you moving."}</p>`) + rule;
+    return;
+  }
+  let body;
+  if (c.status === "thinking") body = `<div class="thinking">Reading your work… <button class="btn small" id="coachStop">Stop</button></div>`;
+  else if (c.status === "error") body = (c.text ? `<div class="prose">${md(c.text)}</div>` : "") + `<p class="err">${esc(c.error)}</p>`;
+  else body = `<div class="prose" id="coachBody">${md(c.text)}</div>` + (c.status === "streaming" ? `<button class="btn small" id="coachStop">Stop</button>` : "");
+  el.innerHTML = `<h3>${c.research ? "Research" : "Coach"}</h3><div class="coach-label">${esc(c.label)}</div>${body}` + (c.research ? "" : rule);
+}
+function scrollCoach() { if (window.innerWidth <= 900) $("coachCard").scrollIntoView({ behavior: "smooth", block: "start" }); }
+$("coachCard").addEventListener("click", (e) => { if (e.target.id === "coachStop") ctl && ctl.abort(); });
+
+/* ---------- practice timer ---------- */
+let tick = null;
+function startTimer() { const now = Date.now(); S.timer = { start: now, secStart: now, idx: 0, splits: [] }; tick = setInterval(updateTimer, 250); renderSurface(); }
+function nextSection() { const now = Date.now(); S.timer.splits[S.timer.idx] = (now - S.timer.secStart) / 1000; S.timer.idx++; S.timer.secStart = now; renderSurface(); }
+function finishTimer(save) {
+  const s = current();
+  clearInterval(tick); tick = null;
+  if (save && S.timer && s) {
+    const now = Date.now();
+    S.timer.splits[S.timer.idx] = (now - S.timer.secStart) / 1000;
+    s.practice = { total: (now - S.timer.start) / 1000, splits: s.sections.map((_, i) => S.timer.splits[i] ?? null), at: now };
+    scheduleSave();
+  }
+  S.timer = null; renderSurface(); renderSteps();
+}
+function updateTimer() {
+  if (!S.timer) return;
+  const d = $("digits"); if (d) d.textContent = fmtClock((Date.now() - S.timer.start) / 1000);
+  const a = document.querySelector(`[data-actual="${S.timer.idx}"]`); if (a) a.textContent = fmtClock((Date.now() - S.timer.secStart) / 1000);
+}
+
+/* ---------- export ---------- */
+function asText(s) {
+  const lines = [s.title || "Untitled sermon", [s.ref, s.trans, s.date].filter(Boolean).join(" · "), ""];
+  if (s.bigIdea) lines.push("Big idea: " + s.bigIdea, "");
+  s.sections.forEach(sec => { lines.push(sectionLabel(s, sec).toUpperCase() + (sec.heading ? ": " + sec.heading : "") + (sec.verses ? " (v. " + sec.verses + ")" : ""), "", sec.body.trim(), ""); });
+  return lines.join("\n");
+}
+
+/* ---------- events ---------- */
+$("surface").addEventListener("click", async (e) => {
+  const s = current(); if (!s) return;
+  const t = e.target;
+  if (t.id === "loadPassage") { loadPassage(); return; }
+  if (t.id === "useReading") { useReading(); return; }
+  const rs = t.closest("[data-research]"); if (rs) { runResearch(rs.dataset.research); return; }
+  const c = t.closest("[data-coach]"); if (c) { runCoach(c.dataset.coach, c.dataset.key); return; }
+  if (t.id === "addPoint") {
+    const at = s.sections.findIndex(x => x.kind === "conclusion");
+    s.sections.splice(at, 0, { key: uid("p"), kind: "point", heading: "", verses: "", body: "" });
+    scheduleSave(); renderSurface(); renderClock(); return;
+  }
+  const rm = t.closest("[data-rm]");
+  if (rm) { rm.parentElement.innerHTML = `Remove this point and its writing? <button class="btn small" data-rmyes="${esc(rm.dataset.rm)}">Remove</button> <button class="btn small" data-rmno>Keep</button>`; return; }
+  const ry = t.closest("[data-rmyes]");
+  if (ry) { s.sections = s.sections.filter(x => x.key !== ry.dataset.rmyes); scheduleSave(); renderSurface(); renderClock(); return; }
+  if (t.closest("[data-rmno]")) { renderSurface(); return; }
+  if (t.id === "tStart") { startTimer(); return; }
+  if (t.id === "tNext") { nextSection(); return; }
+  if (t.id === "tFinish") { finishTimer(true); return; }
+  if (t.id === "tCancel") { finishTimer(false); return; }
+  if (t.id === "saveFile") {
+    const name = (s.title || s.ref || "sermon").replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "-").slice(0, 60) || "sermon";
+    try { await downloads.save({ filename: name + ".txt", data: asText(s) }); $("fileNote").textContent = "Saved."; }
+    catch (err) { $("fileNote").textContent = err && err.code === "declined" ? "" : "Couldn't save the file here."; }
+  }
+});
+$("sermonSel").addEventListener("change", () => { S.currentId = $("sermonSel").value; store.set("current", S.currentId); S.coach = null; if (S.timer) finishTimer(false); renderAll(); });
+$("newBtn").onclick = newSermon;
+$("welcomeNew").onclick = newSermon;
+$("delWrap").addEventListener("click", (e) => {
+  const s = current(); if (!s) return;
+  if (e.target.id === "delBtn") { $("delWrap").innerHTML = `Delete “${esc(s.title || s.ref || "Untitled sermon")}”? <button class="btn small" id="delYes">Delete</button> <button class="btn small" id="delNo">Keep</button>`; return; }
+  const reset = () => { $("delWrap").innerHTML = `<button class="btn" id="delBtn">Delete</button>`; };
+  if (e.target.id === "delNo") { reset(); return; }
+  if (e.target.id === "delYes") {
+    const id = s.id; reset();
+    sermons = sermons.filter(x => x.id !== id); S.currentId = sermons[0] ? sermons[0].id : null; S.coach = null;
+    removeSermon(id).catch(() => {}); renderPicker(); renderAll();
+  }
+});
+
+window.addEventListener("sermon:show", () => { if (booted) renderAll(); });
+/* ---------- boot ---------- */
+renderPicker();
+initStore();
+})();
+</script>
+
+</html>
